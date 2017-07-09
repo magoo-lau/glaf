@@ -182,7 +182,7 @@ public class DatabaseResourceRest {
 		database.setPassword(password);
 		database.setTitle(request.getParameter("title"));
 		database.setCode(request.getParameter("code"));
-		database.setNodeId(RequestUtils.getLong(request, "nodeId"));
+		//database.setNodeId(RequestUtils.getLong(request, "nodeId"));
 		database.setHost(request.getParameter("host"));
 		database.setPort(RequestUtils.getInt(request, "port"));
 		database.setName(request.getParameter("name"));

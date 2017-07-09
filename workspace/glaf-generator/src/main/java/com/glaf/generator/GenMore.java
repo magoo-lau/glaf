@@ -21,7 +21,7 @@ package com.glaf.generator;
 import java.io.*;
 
 import com.glaf.core.domain.TableDefinition;
-import com.glaf.core.xml.XmlReader;
+import com.glaf.generator.xml.XmlReader;
 
 public class GenMore {
 
@@ -41,8 +41,7 @@ public class GenMore {
 				} else {
 					if (file.getName().endsWith("mapping.xml")) {
 						FileInputStream fin = new FileInputStream(file);
-						TableDefinition def = new XmlReader()
-								.read(fin);
+						TableDefinition def = new XmlReader().read(fin);
 						JavaCodeGen gen = new JavaCodeGen();
 						String config = System.getProperty("codegen.cfg");
 						if (config == null) {

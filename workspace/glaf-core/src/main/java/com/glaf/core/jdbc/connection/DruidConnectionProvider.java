@@ -22,6 +22,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -43,10 +45,11 @@ import com.glaf.core.util.ReflectUtils;
  */
 public class DruidConnectionProvider implements ConnectionProvider {
 
-	private static final Log log = LogFactory
-			.getLog(DruidConnectionProvider.class);
+	private static final Log log = LogFactory.getLog(DruidConnectionProvider.class);
 
 	protected static Configuration conf = BaseConfiguration.create();
+
+	protected static int MAX_RETRIES = conf.getInt("jdbc.connection.retryCount", 10);
 
 	private volatile DruidDataSource ds;
 
@@ -78,16 +81,13 @@ public class DruidConnectionProvider implements ConnectionProvider {
 			}
 		}
 
-		Properties connectionProps = ConnectionProviderFactory
-				.getConnectionProperties(properties);
-		log.info("Connection properties: "
-				+ PropertiesHelper.maskOut(connectionProps, "password"));
+		Properties connectionProps = ConnectionProviderFactory.getConnectionProperties(properties);
+		log.info("Connection properties: " + PropertiesHelper.maskOut(connectionProps, "password"));
 
 		String jdbcDriverClass = properties.getProperty("jdbc.driver");
 		String jdbcUrl = properties.getProperty("jdbc.url");
 
-		log.info("Druid using driver: " + jdbcDriverClass + " at URL: "
-				+ jdbcUrl);
+		log.info("Druid using driver: " + jdbcDriverClass + " at URL: " + jdbcUrl);
 
 		autocommit = PropertiesHelper.getBoolean("jdbc.autocommit", properties);
 		log.info("autocommit mode: " + autocommit);
@@ -101,8 +101,7 @@ public class DruidConnectionProvider implements ConnectionProvider {
 				try {
 					ReflectUtils.instantiate(jdbcDriverClass);
 				} catch (Exception e) {
-					String msg = "JDBC Driver class not found: "
-							+ jdbcDriverClass;
+					String msg = "JDBC Driver class not found: " + jdbcDriverClass;
 					log.error(msg, e);
 					throw new RuntimeException(msg, e);
 				}
@@ -111,20 +110,14 @@ public class DruidConnectionProvider implements ConnectionProvider {
 
 		try {
 
-			Integer maxPoolSize = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_MAXACTIVE, properties);
-			Integer maxStatements = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_MAXSTATEMENTS, properties);
-
-			Integer timeBetweenEvictionRuns = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_TIMEBETWEENEVICTIONRUNS,
-					properties);
-
-			Integer maxWait = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_MAXWAIT, properties);
-
-			String validationQuery = properties
-					.getProperty(ConnectionConstants.PROP_VALIDATIONQUERY);
+			Integer maxPoolSize = PropertiesHelper.getInteger(ConnectionConstants.PROP_MAXACTIVE, properties);
+			Integer maxStatements = PropertiesHelper.getInteger(ConnectionConstants.PROP_MAXSTATEMENTS, properties);
+			Integer timeBetweenEvictionRuns = PropertiesHelper
+					.getInteger(ConnectionConstants.PROP_TIMEBETWEENEVICTIONRUNS, properties);
+			Integer maxWait = PropertiesHelper.getInteger(ConnectionConstants.PROP_MAXWAIT, properties);
+			String validationQuery = properties.getProperty(ConnectionConstants.PROP_VALIDATIONQUERY);
+			String dbUser = properties.getProperty("jdbc.user");
+			String dbPassword = properties.getProperty("jdbc.password");
 
 			if (maxPoolSize == null) {
 				maxPoolSize = 50;
@@ -137,9 +130,6 @@ public class DruidConnectionProvider implements ConnectionProvider {
 			if (maxWait == null) {
 				maxWait = 60;
 			}
-
-			String dbUser = properties.getProperty("jdbc.user");
-			String dbPassword = properties.getProperty("jdbc.password");
 
 			if (dbUser == null) {
 				dbUser = "";
@@ -191,10 +181,8 @@ public class DruidConnectionProvider implements ConnectionProvider {
 
 			ds.init();
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			log.error("could not instantiate Druid connection pool", ex);
-			throw new RuntimeException(
-					"Could not instantiate Druid connection pool", ex);
+			throw new RuntimeException("Could not instantiate Druid connection pool", ex);
 		}
 
 		String i = properties.getProperty("jdbc.isolation");
@@ -208,14 +196,13 @@ public class DruidConnectionProvider implements ConnectionProvider {
 
 	public Connection getConnection() throws SQLException {
 		Connection connection = null;
-		int count = 0;
-		while (count < conf.getInt("jdbc.connection.retryCount", 10)) {
+		int retries = 0;
+		while (retries < MAX_RETRIES) {
 			try {
 				connection = ds.getConnection();
 				if (connection != null) {
 					if (isolation != null) {
-						connection
-								.setTransactionIsolation(isolation.intValue());
+						connection.setTransactionIsolation(isolation.intValue());
 					}
 					if (connection.getAutoCommit() != autocommit) {
 						connection.setAutoCommit(autocommit);
@@ -223,25 +210,19 @@ public class DruidConnectionProvider implements ConnectionProvider {
 					log.debug("druid connection: " + connection.toString());
 					return connection;
 				} else {
-					count++;
+					retries++;
 					try {
-						Thread.sleep(conf.getInt("jdbc.connection.retryTimeMs",
-								500));
+						TimeUnit.MILLISECONDS.sleep(200 + new Random().nextInt(1000));// 活锁，随机等待
 					} catch (InterruptedException e) {
-						e.printStackTrace();
 					}
 				}
 			} catch (SQLException ex) {
-				count++;
-				try {
-					Thread.sleep(conf
-							.getInt("jdbc.connection.retryTimeMs", 500));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				if (retries++ == MAX_RETRIES) {
+					throw new SQLException("druid can't getConnection", ex);
 				}
-				if (count >= conf.getInt("jdbc.connection.retryCount", 10)) {
-					ex.printStackTrace();
-					throw ex;
+				try {
+					TimeUnit.MILLISECONDS.sleep(200 + new Random().nextInt(1000));// 活锁，随机等待
+				} catch (InterruptedException e) {
 				}
 			}
 		}

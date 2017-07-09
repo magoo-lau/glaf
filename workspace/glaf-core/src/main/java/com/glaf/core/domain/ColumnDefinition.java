@@ -18,357 +18,271 @@
 
 package com.glaf.core.domain;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.glaf.core.base.ClassDefinition;
-import com.glaf.core.base.FieldDefinition;
+import com.glaf.core.base.BaseItem;
 import com.glaf.core.domain.util.ColumnDefinitionJsonFactory;
 
 /**
  * 数据字段定义
  * 
  */
-@Entity
-@Table(name = "SYS_COLUMN")
-public class ColumnDefinition implements
-		java.lang.Comparable<ColumnDefinition>, java.io.Serializable,
-		FieldDefinition {
+public class ColumnDefinition implements java.lang.Comparable<ColumnDefinition>, java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 主键
 	 */
-	@Id
-	@Column(name = "ID_", length = 100, nullable = false)
 	protected String id;
 
 	/**
 	 * 数据库中表的别名
 	 */
-	@Column(name = "ALIAS_", length = 50)
 	protected String alias;
 
-	@Column(name = "ALIGN_", length = 50)
 	protected String align;
 
 	/**
 	 * 数据库字段标签
 	 */
-	@Column(name = "COLUMNLABEL_", length = 50)
 	protected String columnLabel;
 
 	/**
 	 * 数据库字段名称
 	 */
-	@Column(name = "COLUMNNAME_", length = 50)
 	protected String columnName;
 
-	@Column(name = "DATACODE_", length = 50)
 	protected String dataCode;
 
-	@javax.persistence.Transient
 	protected int index;
 
 	/**
 	 * 数据库类型
 	 */
-	@javax.persistence.Transient
 	protected int dataType;
-
-	@javax.persistence.Transient
-	protected Date dateValue;
 
 	/**
 	 * 默认值
 	 */
-	@Column(name = "DEFAULTVALUE_", length = 200)
 	protected String defaultValue;
 
 	/**
 	 * 鉴别类型,C-数据库字段，P-查询参数
 	 */
-	@Column(name = "DISCRIMINATOR_", length = 10)
 	protected String discriminator;
 
 	/**
 	 * 显示类型 0-不显示，1-表单，2-表单及列表
 	 */
-	@Column(name = "DISPLAYTYPE_")
 	protected int displayType;
 
-	@javax.persistence.Transient
-	protected double doubleValue;
-
-	@Column(name = "EDITABLE_", length = 10)
 	protected String editableField;
 
 	/**
 	 * ENGLISH标题
 	 */
-	@Column(name = "ENGLISHTITLE_", length = 100)
 	protected String englishTitle;
 
 	/**
 	 * 显示格式
 	 */
-	@Column(name = "FORMATTER_", length = 200)
 	protected String formatter;
 
 	/**
 	 * 公式
 	 */
-	@Column(name = "FORMULA_", length = 200)
 	protected String formula;
 
 	/**
 	 * 是否冻结列
 	 */
-	@Column(name = "FROZEN_", length = 10)
 	protected String frozenField;
 
-	@Column(name = "HEIGHT_", length = 50)
 	protected String height;
 
 	/**
 	 * 是否隐藏列
 	 */
-	@Column(name = "HIDDEN_", length = 10)
 	protected String hiddenField;
 
 	/**
 	 * 输入类型（文本框、数值输入、日期输入、下拉列表、复选框）
 	 */
-	@Column(name = "INPUTTYPE_", length = 50)
 	protected String inputType;
-
-	@Column(name = "INITVALUE_", length = 250)
-	protected String initValue;
-
-	@javax.persistence.Transient
-	protected int intValue;
 
 	/**
 	 * 参数是否为集合类型
 	 */
-	@Column(name = "ISCOLLECTION_", length = 10)
 	protected String isCollectionField;
 
 	/**
 	 * Java类型
 	 */
-	@Column(name = "JAVATYPE_", length = 20)
 	protected String javaType;
 
 	/**
 	 * 字段长度
 	 */
-	@Column(name = "LENGTH_")
 	protected int length;
 
-	@Column(name = "LINK_", length = 200)
 	protected String link;
 
-	@javax.persistence.Transient
-	protected boolean listShow;
-
-	@javax.persistence.Transient
-	protected long longValue;
-
-	@Column(name = "MASK_", length = 100)
 	protected String mask;
 
 	/**
 	 * 属性名称
 	 */
-	@Column(name = "NAME_", length = 50)
 	protected String name;
 
 	/**
 	 * 是否为空
 	 */
-	@Column(name = "NULL_", length = 10)
 	protected String nullableField = "1";
 
 	/**
 	 * 字段顺序号
 	 */
-	@Column(name = "ORDINAL_")
 	protected int ordinal;
 
 	/**
 	 * 字段精度
 	 */
-	@Column(name = "PRECISION_")
 	protected int precision;
 
 	/**
 	 * 是否主键
 	 */
-	@Column(name = "PRIMARYKEY_", length = 10)
 	protected String primaryKeyField;
 
 	/**
 	 * 查询编号
 	 */
-	@Column(name = "QUERYID_", length = 50, nullable = true)
 	protected String queryId;
 
 	/**
 	 * 正则表达式
 	 */
-	@Column(name = "REGEX_", length = 100)
 	protected String regex;
 
-	@Lob
-	@Column(name = "RENDERER_", length = 100)
 	protected String renderer;
 
-	@Column(name = "RENDERTYPE_", length = 50)
 	protected String renderType;
 
 	/**
 	 * 是否必填
 	 */
-	@Column(name = "required", length = 10)
 	protected String requiredField = "0";
 
 	/**
 	 * 是否可调整列宽
 	 */
-	@Column(name = "RESIZABLE_", length = 10)
 	protected String resizableField;
 
 	/**
 	 * 小数位数
 	 */
-	@Column(name = "SCALE_")
 	protected int scale;
 
-	@Column(name = "SEARCHABLE_", length = 10)
 	protected String searchableField;
 
 	/**
 	 * 是否可排序
 	 */
-	@Column(name = "SORTABLE_", length = 10)
 	protected String sortableField;
 
 	/**
 	 * 排序类型 int-整形、number-数值、date-日期时间
 	 */
-	@Column(name = "SORTTYPE_", length = 50)
 	protected String sortType;
-
-	@javax.persistence.Transient
-	protected String stringValue;
 
 	/**
 	 * 汇总表达式
 	 */
-	@Column(name = "SUMMARYEXPR_", length = 200)
 	protected String summaryExpr;
 
 	/**
 	 * 汇总类型，sum-求和、count-算个数
 	 */
-	@Column(name = "SUMMARYTYPE_", length = 50)
 	protected String summaryType;
 
-	@Column(name = "SYSTEMFLAG_", length = 2)
 	protected String systemFlag;
+
+	protected String tableId;
 
 	/**
 	 * 表名
 	 */
-	@Column(name = "TABLENAME_", length = 50, nullable = true)
 	protected String tableName;
 
 	/**
 	 * 目标ID
 	 */
-	@Column(name = "TARGETID_", length = 50, nullable = true)
 	protected String targetId;
 
 	/**
 	 * 下拉列表的文本字段
 	 */
-	@Column(name = "TEXTFIELD_", length = 50)
 	protected String textField;
 
 	/**
 	 * 标题
 	 */
-	@Column(name = "TITLE_", length = 100)
 	protected String title;
 
 	/**
 	 * 在列头部显示的提示文字
 	 */
-	@Column(name = "TOOLTIP_", length = 100)
 	protected String tooltip;
 
-	/**
-	 * 转换器
-	 */
-	@Column(name = "TRANSLATOR_", length = 100)
-	protected String translator;
-
-	@Column(name = "UNIQUE_", length = 10)
 	protected String uniqueField;
 
-	@Column(name = "UPDATEABLE_", length = 10)
 	protected String updatableField;
 
 	/**
 	 * 下拉列表的取数URL
 	 */
-	@Column(name = "URL_", length = 250)
 	protected String url;
 
 	/**
 	 * 验证类型
 	 */
-	@Column(name = "VALIDTYPE_", length = 50)
 	protected String validType;
 
-	@javax.persistence.Transient
 	protected Object value;
 
-	@Column(name = "PLACEHOLDER_", length = 200)
 	protected String placeholder;
 
-	@Column(name = "VALUEEXPRESSION_", length = 100)
 	protected String valueExpression;
 
 	/**
 	 * 下拉列表的值字段
 	 */
-	@Column(name = "VALUEFIELD_", length = 50)
 	protected String valueField;
 
-	@Column(name = "WIDTH_", length = 50)
 	protected String width;
 
-	@Column(name = "POSITION_")
 	protected Integer position;
 
-	@javax.persistence.Transient
+	protected List<BaseItem> items = null;
+
 	protected Map<String, String> properties = new java.util.HashMap<String, String>();
 
 	public ColumnDefinition() {
 
+	}
+
+	public void addItem(BaseItem item) {
+		if (items == null) {
+			items = new ArrayList<BaseItem>();
+		}
+		items.add(item);
 	}
 
 	public void addProperty(String key, String value) {
@@ -422,10 +336,6 @@ public class ColumnDefinition implements
 		return align;
 	}
 
-	public ClassDefinition getClassDefinition() {
-		return null;
-	}
-
 	public String getColumnLabel() {
 		return columnLabel;
 	}
@@ -445,10 +355,6 @@ public class ColumnDefinition implements
 		return dataType;
 	}
 
-	public Date getDateValue() {
-		return dateValue;
-	}
-
 	public String getDefaultValue() {
 		return defaultValue;
 	}
@@ -459,10 +365,6 @@ public class ColumnDefinition implements
 
 	public int getDisplayType() {
 		return displayType;
-	}
-
-	public double getDoubleValue() {
-		return doubleValue;
 	}
 
 	public String getEditableField() {
@@ -509,16 +411,8 @@ public class ColumnDefinition implements
 		return index;
 	}
 
-	public String getInitValue() {
-		return initValue;
-	}
-
 	public String getInputType() {
 		return inputType;
-	}
-
-	public int getIntValue() {
-		return intValue;
 	}
 
 	public String getIsCollection() {
@@ -527,6 +421,10 @@ public class ColumnDefinition implements
 
 	public String getIsCollectionField() {
 		return isCollectionField;
+	}
+
+	public List<BaseItem> getItems() {
+		return items;
 	}
 
 	public String getJavaType() {
@@ -541,12 +439,15 @@ public class ColumnDefinition implements
 		return link;
 	}
 
-	public long getLongValue() {
-		return longValue;
-	}
-
 	public String getLowerCaseType() {
 		return javaType.toLowerCase();
+	}
+
+	public String getLowerColumnName() {
+		if (columnName != null) {
+			columnName = columnName.trim().toLowerCase();
+		}
+		return columnName;
 	}
 
 	public String getMask() {
@@ -637,10 +538,6 @@ public class ColumnDefinition implements
 		return sortType;
 	}
 
-	public String getStringValue() {
-		return stringValue;
-	}
-
 	public String getSummaryExpr() {
 		return summaryExpr;
 	}
@@ -651,6 +548,10 @@ public class ColumnDefinition implements
 
 	public String getSystemFlag() {
 		return systemFlag;
+	}
+
+	public String getTableId() {
+		return tableId;
 	}
 
 	public String getTableName() {
@@ -671,10 +572,6 @@ public class ColumnDefinition implements
 
 	public String getTooltip() {
 		return tooltip;
-	}
-
-	public String getTranslator() {
-		return translator;
 	}
 
 	public String getType() {
@@ -717,14 +614,12 @@ public class ColumnDefinition implements
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((getColumnName() == null) ? 0 : getColumnName().hashCode());
+		result = prime * result + ((getColumnName() == null) ? 0 : getColumnName().hashCode());
 		return result;
 	}
 
 	public boolean isCollection() {
-		if (StringUtils.equalsIgnoreCase(isCollectionField, "1")
-				|| StringUtils.equalsIgnoreCase(isCollectionField, "Y")
+		if (StringUtils.equalsIgnoreCase(isCollectionField, "1") || StringUtils.equalsIgnoreCase(isCollectionField, "Y")
 				|| StringUtils.equalsIgnoreCase(isCollectionField, "true")) {
 			return true;
 		}
@@ -732,8 +627,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isEditable() {
-		if (StringUtils.equalsIgnoreCase(editableField, "1")
-				|| StringUtils.equalsIgnoreCase(editableField, "Y")
+		if (StringUtils.equalsIgnoreCase(editableField, "1") || StringUtils.equalsIgnoreCase(editableField, "Y")
 				|| StringUtils.equalsIgnoreCase(editableField, "true")) {
 			return true;
 		}
@@ -741,8 +635,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isFrozen() {
-		if (StringUtils.equalsIgnoreCase(frozenField, "1")
-				|| StringUtils.equalsIgnoreCase(frozenField, "Y")
+		if (StringUtils.equalsIgnoreCase(frozenField, "1") || StringUtils.equalsIgnoreCase(frozenField, "Y")
 				|| StringUtils.equalsIgnoreCase(frozenField, "true")) {
 			return true;
 		}
@@ -750,24 +643,15 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isHidden() {
-		if (StringUtils.equalsIgnoreCase(hiddenField, "1")
-				|| StringUtils.equalsIgnoreCase(hiddenField, "Y")
+		if (StringUtils.equalsIgnoreCase(hiddenField, "1") || StringUtils.equalsIgnoreCase(hiddenField, "Y")
 				|| StringUtils.equalsIgnoreCase(hiddenField, "true")) {
 			return true;
 		}
 		return false;
 	}
 
-	public boolean isListShow() {
-		if (displayType == 2) {
-			listShow = true;
-		}
-		return listShow;
-	}
-
 	public boolean isNullable() {
-		if (StringUtils.equalsIgnoreCase(nullableField, "1")
-				|| StringUtils.equalsIgnoreCase(nullableField, "Y")
+		if (StringUtils.equalsIgnoreCase(nullableField, "1") || StringUtils.equalsIgnoreCase(nullableField, "Y")
 				|| StringUtils.equalsIgnoreCase(nullableField, "true")) {
 			return true;
 		}
@@ -775,8 +659,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isPrimaryKey() {
-		if (StringUtils.equalsIgnoreCase(primaryKeyField, "1")
-				|| StringUtils.equalsIgnoreCase(primaryKeyField, "Y")
+		if (StringUtils.equalsIgnoreCase(primaryKeyField, "1") || StringUtils.equalsIgnoreCase(primaryKeyField, "Y")
 				|| StringUtils.equalsIgnoreCase(primaryKeyField, "true")) {
 			return true;
 		}
@@ -784,8 +667,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isRequired() {
-		if (StringUtils.equalsIgnoreCase(requiredField, "1")
-				|| StringUtils.equalsIgnoreCase(requiredField, "Y")
+		if (StringUtils.equalsIgnoreCase(requiredField, "1") || StringUtils.equalsIgnoreCase(requiredField, "Y")
 				|| StringUtils.equalsIgnoreCase(requiredField, "true")) {
 			return true;
 		}
@@ -793,8 +675,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isResizable() {
-		if (StringUtils.equalsIgnoreCase(resizableField, "1")
-				|| StringUtils.equalsIgnoreCase(resizableField, "Y")
+		if (StringUtils.equalsIgnoreCase(resizableField, "1") || StringUtils.equalsIgnoreCase(resizableField, "Y")
 				|| StringUtils.equalsIgnoreCase(resizableField, "true")) {
 			return true;
 		}
@@ -802,8 +683,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isSearchable() {
-		if (StringUtils.equalsIgnoreCase(searchableField, "1")
-				|| StringUtils.equalsIgnoreCase(searchableField, "Y")
+		if (StringUtils.equalsIgnoreCase(searchableField, "1") || StringUtils.equalsIgnoreCase(searchableField, "Y")
 				|| StringUtils.equalsIgnoreCase(searchableField, "true")) {
 			return true;
 		}
@@ -811,8 +691,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isSortable() {
-		if (StringUtils.equalsIgnoreCase(sortableField, "1")
-				|| StringUtils.equalsIgnoreCase(sortableField, "Y")
+		if (StringUtils.equalsIgnoreCase(sortableField, "1") || StringUtils.equalsIgnoreCase(sortableField, "Y")
 				|| StringUtils.equalsIgnoreCase(sortableField, "true")) {
 			return true;
 		}
@@ -820,8 +699,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isUnique() {
-		if (StringUtils.equalsIgnoreCase(uniqueField, "1")
-				|| StringUtils.equalsIgnoreCase(uniqueField, "Y")
+		if (StringUtils.equalsIgnoreCase(uniqueField, "1") || StringUtils.equalsIgnoreCase(uniqueField, "Y")
 				|| StringUtils.equalsIgnoreCase(uniqueField, "true")) {
 			return true;
 		}
@@ -829,8 +707,7 @@ public class ColumnDefinition implements
 	}
 
 	public boolean isUpdatable() {
-		if (StringUtils.equalsIgnoreCase(updatableField, "1")
-				|| StringUtils.equalsIgnoreCase(updatableField, "Y")
+		if (StringUtils.equalsIgnoreCase(updatableField, "1") || StringUtils.equalsIgnoreCase(updatableField, "Y")
 				|| StringUtils.equalsIgnoreCase(updatableField, "true")) {
 			return true;
 		}
@@ -847,10 +724,6 @@ public class ColumnDefinition implements
 
 	public void setAlign(String align) {
 		this.align = align;
-	}
-
-	public void setClassDefinition(ClassDefinition classDefinition) {
-
 	}
 
 	public void setCollection(boolean isCollection) {
@@ -877,10 +750,6 @@ public class ColumnDefinition implements
 		this.dataType = dataType;
 	}
 
-	public void setDateValue(Date dateValue) {
-		this.dateValue = dateValue;
-	}
-
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
@@ -891,10 +760,6 @@ public class ColumnDefinition implements
 
 	public void setDisplayType(int displayType) {
 		this.displayType = displayType;
-	}
-
-	public void setDoubleValue(double doubleValue) {
-		this.doubleValue = doubleValue;
 	}
 
 	public void setEditable(boolean editable) {
@@ -957,20 +822,16 @@ public class ColumnDefinition implements
 		this.index = index;
 	}
 
-	public void setInitValue(String initValue) {
-		this.initValue = initValue;
-	}
-
 	public void setInputType(String inputType) {
 		this.inputType = inputType;
 	}
 
-	public void setIntValue(int intValue) {
-		this.intValue = intValue;
-	}
-
 	public void setIsCollectionField(String isCollectionField) {
 		this.isCollectionField = isCollectionField;
+	}
+
+	public void setItems(List<BaseItem> items) {
+		this.items = items;
 	}
 
 	public void setJavaType(String javaType) {
@@ -983,14 +844,6 @@ public class ColumnDefinition implements
 
 	public void setLink(String link) {
 		this.link = link;
-	}
-
-	public void setListShow(boolean listShow) {
-		this.listShow = listShow;
-	}
-
-	public void setLongValue(long longValue) {
-		this.longValue = longValue;
 	}
 
 	public void setMask(String mask) {
@@ -1129,10 +982,6 @@ public class ColumnDefinition implements
 		this.sortType = sortType;
 	}
 
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
-
 	public void setSummaryExpr(String summaryExpr) {
 		this.summaryExpr = summaryExpr;
 	}
@@ -1143,6 +992,10 @@ public class ColumnDefinition implements
 
 	public void setSystemFlag(String systemFlag) {
 		this.systemFlag = systemFlag;
+	}
+
+	public void setTableId(String tableId) {
+		this.tableId = tableId;
 	}
 
 	public void setTableName(String tableName) {
@@ -1163,10 +1016,6 @@ public class ColumnDefinition implements
 
 	public void setTooltip(String tooltip) {
 		this.tooltip = tooltip;
-	}
-
-	public void setTranslator(String translator) {
-		this.translator = translator;
 	}
 
 	public void setType(String javaType) {

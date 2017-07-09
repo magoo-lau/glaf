@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.glaf.core.security.LoginContext;
 
+import io.netty.util.concurrent.FastThreadLocal;
+
 public class Environment {
 	protected static final Log logger = LogFactory.getLog(Environment.class);
 
@@ -41,11 +43,11 @@ public class Environment {
 
 	protected static ConcurrentMap<String, Properties> systemProperties = new ConcurrentHashMap<String, Properties>();
 
-	protected static ThreadLocal<LoginContext> threadLocalContexts = new ThreadLocal<LoginContext>();
+	protected static FastThreadLocal<LoginContext> threadLocalContexts = new FastThreadLocal<LoginContext>();
 
-	protected static ThreadLocal<Map<String, String>> threadLocalVaribles = new ThreadLocal<Map<String, String>>();
+	protected static FastThreadLocal<Map<String, String>> threadLocalVaribles = new FastThreadLocal<Map<String, String>>();
 
-	protected static ThreadLocal<String> systemNameThreadLocal = new ThreadLocal<String>();
+	protected static FastThreadLocal<String> systemNameThreadLocal = new FastThreadLocal<String>();
 
 	public static void clear(){
 		threadLocalContexts.remove();
@@ -59,7 +61,7 @@ public class Environment {
 
 	public static String getCurrentSystemName() {
 		if (systemNameThreadLocal.get() != null) {
-			logger.debug("systemName:" + systemNameThreadLocal.get());
+			//logger.debug("systemName:" + systemNameThreadLocal.get());
 			return systemNameThreadLocal.get();
 		}
 		return DEFAULT_SYSTEM_NAME;

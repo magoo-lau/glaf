@@ -71,7 +71,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 				defaultTargetDataSource = provider.getDataSource();
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			
 			logger.error(ex);
 		}
 		setDefaultTargetDataSource(defaultTargetDataSource);

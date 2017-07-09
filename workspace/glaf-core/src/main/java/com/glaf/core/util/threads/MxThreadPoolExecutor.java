@@ -23,14 +23,13 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
  
+
 /**
  * Same as a java.util.concurrent.ThreadPoolExecutor but implements a much more efficient
  * {@link #getSubmittedCount()} method, to be used to properly handle the work queue.
  * If a RejectedExecutionHandler is not specified a default one will be configured
  * and that one will always throw a RejectedExecutionException
- * @author fhanik
  *
  */
 public class MxThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor {
@@ -63,19 +62,23 @@ public class MxThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecuto
 
     public MxThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
+        prestartAllCoreThreads();
     }
 
     public MxThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory,
             RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+        prestartAllCoreThreads();
     }
 
     public MxThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, new RejectHandler());
+        prestartAllCoreThreads();
     }
 
     public MxThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, new RejectHandler());
+        prestartAllCoreThreads();
     }
 
     public long getThreadRenewalDelay() {
@@ -151,6 +154,8 @@ public class MxThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecuto
      * full after that.
      *
      * @param command the runnable task
+     * @param timeout A timeout for the completion of the task
+     * @param unit The timeout time unit
      * @throws RejectedExecutionException if this task cannot be
      * accepted for execution - the queue is full
      * @throws NullPointerException if command or unit is null
@@ -169,7 +174,6 @@ public class MxThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecuto
                     }
                 } catch (InterruptedException x) {
                     submittedCount.decrementAndGet();
-                    Thread.interrupted();
                     throw new RejectedExecutionException(x);
                 }
             } else {

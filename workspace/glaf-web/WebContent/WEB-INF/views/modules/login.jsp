@@ -139,7 +139,7 @@
                     </td>
                     <td>
                         <input id="x" name="x" class="easyui-validatebox input" required="true" validtype="length[3,20]"
-                            style="width: 150px;" datatype="string" nullable="no" maxsize="20" chname="用户名" value="root" />
+                            style="width: 150px;" datatype="string" nullable="no" maxsize="20" chname="用户名" value="admin" />
                     </td>
                 </tr>
                 <tr>

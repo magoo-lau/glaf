@@ -76,6 +76,7 @@ public class CommonsHttpClientUtils {
 				content = method.getResponseBodyAsString();
 			}
 		} catch (IOException ex) {
+			
 			throw new RuntimeException(ex);
 		} finally {
 			if (method != null) {

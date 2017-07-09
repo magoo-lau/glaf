@@ -155,9 +155,6 @@ public class ColumnDefinitionJsonFactory {
 		if (jsonObject.containsKey("renderType")) {
 			model.setRenderType(jsonObject.getString("renderType"));
 		}
-		if (jsonObject.containsKey("translator")) {
-			model.setTranslator(jsonObject.getString("translator"));
-		}
 		if (jsonObject.containsKey("summaryType")) {
 			model.setSummaryType(jsonObject.getString("summaryType"));
 		}
@@ -200,9 +197,7 @@ public class ColumnDefinitionJsonFactory {
 		if (jsonObject.containsKey("renderer")) {
 			model.setRenderer(jsonObject.getString("renderer"));
 		}
-		if (jsonObject.containsKey("initValue")) {
-			model.setInitValue(jsonObject.getString("initValue"));
-		}
+
 		if (jsonObject.containsKey("placeholder")) {
 			model.setPlaceholder(jsonObject.getString("placeholder"));
 		}
@@ -326,9 +321,6 @@ public class ColumnDefinitionJsonFactory {
 		if (model.getDefaultValue() != null) {
 			jsonObject.put("defaultValue", model.getDefaultValue());
 		}
-		if (model.getInitValue() != null) {
-			jsonObject.put("initValue", model.getInitValue());
-		}
 		if (model.getDiscriminator() != null) {
 			jsonObject.put("discriminator", model.getDiscriminator());
 		}
@@ -343,9 +335,6 @@ public class ColumnDefinitionJsonFactory {
 		}
 		if (model.getRenderType() != null) {
 			jsonObject.put("renderType", model.getRenderType());
-		}
-		if (model.getTranslator() != null) {
-			jsonObject.put("translator", model.getTranslator());
 		}
 		if (model.getSummaryType() != null) {
 			jsonObject.put("summaryType", model.getSummaryType());
@@ -495,9 +484,7 @@ public class ColumnDefinitionJsonFactory {
 		if (model.getRegex() != null) {
 			jsonObject.put("regex", model.getRegex());
 		}
-		if (model.getInitValue() != null) {
-			jsonObject.put("initValue", model.getInitValue());
-		}
+
 		if (model.getDefaultValue() != null) {
 			jsonObject.put("defaultValue", model.getDefaultValue());
 		}
@@ -515,9 +502,6 @@ public class ColumnDefinitionJsonFactory {
 		}
 		if (model.getRenderType() != null) {
 			jsonObject.put("renderType", model.getRenderType());
-		}
-		if (model.getTranslator() != null) {
-			jsonObject.put("translator", model.getTranslator());
 		}
 		if (model.getSummaryType() != null) {
 			jsonObject.put("summaryType", model.getSummaryType());

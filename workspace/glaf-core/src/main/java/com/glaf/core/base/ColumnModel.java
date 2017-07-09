@@ -20,14 +20,13 @@ package com.glaf.core.base;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
+import com.alibaba.fastjson.JSONObject;
 import com.glaf.core.util.SearchFilter;
 
-public class ColumnModel implements java.io.Serializable,
-		java.lang.Comparable<ColumnModel> {
+public class ColumnModel implements java.io.Serializable, java.lang.Comparable<ColumnModel> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -126,7 +125,11 @@ public class ColumnModel implements java.io.Serializable,
 	 */
 	protected String valueExpression;
 
+	protected String exportFlag;
+
 	protected String operator = SearchFilter.EQUALS;
+
+	protected Map<String, String> attributes = new HashMap<String, String>();
 
 	public ColumnModel() {
 
@@ -136,6 +139,13 @@ public class ColumnModel implements java.io.Serializable,
 		this.columnName = columnName;
 		this.name = name;
 		this.value = value;
+	}
+
+	public void addAttribute(String key, String value) {
+		if (attributes == null) {
+			attributes = new HashMap<String, String>();
+		}
+		attributes.put(key, value);
 	}
 
 	public int compareTo(ColumnModel o) {
@@ -172,6 +182,10 @@ public class ColumnModel implements java.io.Serializable,
 		return true;
 	}
 
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
 	public Boolean getBooleanValue() {
 		return booleanValue;
 	}
@@ -205,6 +219,10 @@ public class ColumnModel implements java.io.Serializable,
 
 	public Double getDoubleValue() {
 		return doubleValue;
+	}
+
+	public String getExportFlag() {
+		return exportFlag;
 	}
 
 	public String getFormat() {
@@ -294,8 +312,7 @@ public class ColumnModel implements java.io.Serializable,
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((columnName == null) ? 0 : columnName.hashCode());
+		result = prime * result + ((columnName == null) ? 0 : columnName.hashCode());
 		return result;
 	}
 
@@ -305,6 +322,10 @@ public class ColumnModel implements java.io.Serializable,
 
 	public boolean isTemporary() {
 		return temporary;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
 	}
 
 	public void setBooleanValue(Boolean booleanValue) {
@@ -337,6 +358,10 @@ public class ColumnModel implements java.io.Serializable,
 
 	public void setDoubleValue(Double doubleValue) {
 		this.doubleValue = doubleValue;
+	}
+
+	public void setExportFlag(String exportFlag) {
+		this.exportFlag = exportFlag;
 	}
 
 	public void setFormat(String format) {
@@ -423,9 +448,19 @@ public class ColumnModel implements java.io.Serializable,
 		this.valueExpression = valueExpression;
 	}
 
+	public JSONObject toJsonObject() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("columnName", this.getColumnName());
+		jsonObject.put("javaType", this.getJavaType());
+		jsonObject.put("type", this.getType());
+		jsonObject.put("name", this.getName());
+		jsonObject.put("value", this.getValue());
+		return jsonObject;
+	}
+
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this,
-				ToStringStyle.MULTI_LINE_STYLE);
+		return "\ncolumnName=" + columnName + ", javaType=" + javaType + ", position=" + position + ", value=" + value
+				+ "";
 	}
 
 }

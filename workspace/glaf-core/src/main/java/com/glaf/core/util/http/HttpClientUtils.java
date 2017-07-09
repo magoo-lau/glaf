@@ -27,8 +27,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -63,17 +63,18 @@ public class HttpClientUtils {
 	 */
 	public static String doGet(String url, String encoding,
 			Map<String, String> dataMap) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		HttpGet httpGet = null;
 		InputStreamReader is = null;
 		BufferedReader reader = null;
+		CloseableHttpResponse response = null;
 		BasicCookieStore cookieStore = new BasicCookieStore();
 		HttpClientBuilder builder = HttpClientBuilder.create();
 		CloseableHttpClient client = builder.setDefaultCookieStore(cookieStore)
 				.build();
 		try {
 			if (dataMap != null && !dataMap.isEmpty()) {
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (Map.Entry<String, String> entry : dataMap.entrySet()) {
 					String name = entry.getKey().toString();
 					String value = entry.getValue();
@@ -86,7 +87,7 @@ public class HttpClientUtils {
 				}
 			}
 			httpGet = new HttpGet(url);
-			HttpResponse response = client.execute(httpGet);
+			response = client.execute(httpGet);
 			HttpEntity entity = response.getEntity();
 			is = new InputStreamReader(entity.getContent(), encoding);
 			reader = new BufferedReader(is);
@@ -95,14 +96,21 @@ public class HttpClientUtils {
 				buffer.append(tmp);
 				tmp = reader.readLine();
 			}
+			IOUtils.closeStream(entity.getContent());
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			
 			throw new RuntimeException(ex);
 		} finally {
 			IOUtils.closeStream(reader);
 			IOUtils.closeStream(is);
 			if (httpGet != null) {
 				httpGet.releaseConnection();
+			}
+			if (response != null) {
+				try {
+					response.close();
+				} catch (IOException e) {
+				}
 			}
 			try {
 				client.close();
@@ -134,10 +142,11 @@ public class HttpClientUtils {
 	 */
 	public static String doPost(String url, String encoding,
 			Map<String, String> dataMap) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		HttpPost post = null;
 		InputStreamReader is = null;
 		BufferedReader reader = null;
+		CloseableHttpResponse response = null;
 		BasicCookieStore cookieStore = new BasicCookieStore();
 		HttpClientBuilder builder = HttpClientBuilder.create();
 		CloseableHttpClient client = builder.setDefaultCookieStore(cookieStore)
@@ -155,7 +164,7 @@ public class HttpClientUtils {
 						nameValues, encoding);
 				post.setEntity(entity);
 			}
-			HttpResponse response = client.execute(post);
+			response = client.execute(post);
 			HttpEntity entity = response.getEntity();
 			is = new InputStreamReader(entity.getContent(), encoding);
 			reader = new BufferedReader(is);
@@ -164,15 +173,21 @@ public class HttpClientUtils {
 				buffer.append(tmp);
 				tmp = reader.readLine();
 			}
-
+			IOUtils.closeStream(entity.getContent());
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			
 			throw new RuntimeException(ex);
 		} finally {
 			IOUtils.closeStream(reader);
 			IOUtils.closeStream(is);
 			if (post != null) {
 				post.releaseConnection();
+			}
+			if (response != null) {
+				try {
+					response.close();
+				} catch (IOException e) {
+				}
 			}
 			try {
 				client.close();
@@ -184,9 +199,10 @@ public class HttpClientUtils {
 
 	public static String doPost(String url, String data, String contentType,
 			String encoding) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		InputStreamReader is = null;
 		BufferedReader reader = null;
+		CloseableHttpResponse response = null;
 		BasicCookieStore cookieStore = new BasicCookieStore();
 		HttpClientBuilder builder = HttpClientBuilder.create();
 		CloseableHttpClient client = builder.setDefaultCookieStore(cookieStore)
@@ -198,7 +214,7 @@ public class HttpClientUtils {
 				post.setHeader("Content-Type", contentType);
 				post.setEntity(entity);
 			}
-			HttpResponse response = client.execute(post);
+			response = client.execute(post);
 			HttpEntity entity = response.getEntity();
 			is = new InputStreamReader(entity.getContent(), encoding);
 			reader = new BufferedReader(is);
@@ -207,12 +223,19 @@ public class HttpClientUtils {
 				buffer.append(tmp);
 				tmp = reader.readLine();
 			}
+			IOUtils.closeStream(entity.getContent());
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			
 			throw new RuntimeException(ex);
 		} finally {
 			IOUtils.closeStream(reader);
 			IOUtils.closeStream(is);
+			if (response != null) {
+				try {
+					response.close();
+				} catch (IOException e) {
+				}
+			}
 			try {
 				client.close();
 			} catch (IOException ex) {

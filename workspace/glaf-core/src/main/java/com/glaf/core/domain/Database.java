@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import javax.persistence.*;
 
@@ -44,47 +45,121 @@ import com.glaf.core.domain.util.*;
 
 @Entity
 @Table(name = "SYS_DATABASE")
-public class Database implements java.lang.Comparable<Database>, Serializable,
-		JSONable {
+public class Database implements java.lang.Comparable<Database>, Cloneable, Serializable, JSONable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Column(name = "ID_", nullable = false)
 	protected long id;
 
-	@Column(name = "NODEID_")
-	protected Long nodeId;
+	@Column(name = "PARENTID_")
+	protected long parentId;
 
+	/**
+	 * 名称
+	 */
 	@Column(name = "NAME_", length = 200)
 	protected String name;
 
+	/**
+	 * 代码
+	 */
 	@Column(name = "CODE_", length = 50)
 	protected String code;
 
+	/**
+	 * 鉴别符
+	 */
+	@Column(name = "DISCRIMINATOR_", length = 10)
+	protected String discriminator;
+
+	/**
+	 * 映射名
+	 */
+	@Column(name = "MAPPING_", length = 50)
+	protected String mapping;
+
+	/**
+	 * 标段
+	 */
+	@Column(name = "SECTION_", length = 50)
+	protected String section;
+
+	/**
+	 * 标题
+	 */
 	@Column(name = "TITLE_", length = 100)
 	protected String title;
 
+	/**
+	 * 主机
+	 */
 	@Column(name = "HOST_", length = 100)
 	protected String host;
 
+	/**
+	 * 端口
+	 */
 	@Column(name = "PORT_")
-	protected Integer port;
+	protected int port;
 
+	/**
+	 * 用户名
+	 */
 	@Column(name = "USER_", length = 50)
 	protected String user;
 
-	@Column(name = "PASSWORD_", length = 100)
+	/**
+	 * 密码
+	 */
+	@Column(name = "PASSWORD_", length = 2000)
 	protected String password;
 
+	/**
+	 * 密锁
+	 */
 	@Column(name = "KEY_", length = 1024)
 	protected String key;
 
+	/**
+	 * IntToken
+	 */
+	@Column(name = "INTTOKEN_")
+	protected int intToken;
+
+	/**
+	 * Token
+	 */
+	@Column(name = "TOKEN_", length = 200)
+	protected String token;
+
+	/**
+	 * 数据库类型
+	 */
 	@Column(name = "TYPE_", length = 50)
 	protected String type;
 
+	/**
+	 * 运行类型，模板库TPL还是实例库INST
+	 */
+	@Column(name = "RUNTYPE_", length = 50)
+	protected String runType;
+
+	/**
+	 * 使用类型
+	 */
+	@Column(name = "USEYPE_", length = 50)
+	protected String useType;
+
+	/**
+	 * 级别
+	 */
 	@Column(name = "LEVEL_")
 	protected int level = 0;
 
+	/**
+	 * 优先级
+	 */
 	@Column(name = "PRIORITY_")
 	protected int priority = 0;
 
@@ -97,20 +172,125 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 	@Column(name = "OPERATION_")
 	protected int operation = 2;
 
+	/**
+	 * 库名
+	 */
 	@Column(name = "DBNAME_", length = 50)
 	protected String dbname;
 
+	/**
+	 * 分区名
+	 */
+	@Column(name = "BUCKET_", length = 50)
+	protected String bucket;
+
+	/**
+	 * Catalog
+	 */
+	@Column(name = "CATALOG_", length = 50)
+	protected String catalog;
+
+	/**
+	 * InfoServer
+	 */
+	@Column(name = "INFOSERVER_", length = 50)
+	protected String infoServer;
+
+	/**
+	 * LoginAs
+	 */
+	@Column(name = "LOGINAS_", length = 50)
+	protected String loginAs;
+
+	/**
+	 * LoginUrl
+	 */
+	@Column(name = "LOGINURL_", length = 250)
+	protected String loginUrl;
+
+	/**
+	 * Ticket
+	 */
+	@Column(name = "TICKET_", length = 100)
+	protected String ticket;
+
+	/**
+	 * ProgramId
+	 */
+	@Column(name = "PROGRAMID_", length = 250)
+	protected String programId;
+
+	/**
+	 * ProgramName
+	 */
+	@Column(name = "PROGRAMNAME_", length = 250)
+	protected String programName;
+
+	/**
+	 * UserNameKey
+	 */
+	@Column(name = "USERNAMEKEY_", length = 100)
+	protected String userNameKey;
+
+	/**
+	 * ServerId
+	 */
+	@Column(name = "SERVERID_")
+	protected long serverId;
+
+	/**
+	 * SysId
+	 */
+	@Column(name = "SYSID_", length = 50)
+	protected String sysId;
+
+	/**
+	 * QueueName
+	 */
+	@Column(name = "QUEUENAME_", length = 200)
+	protected String queueName;
+
+	/**
+	 * 激活标记
+	 */
 	@Column(name = "ACTIVE_", length = 10)
 	protected String active;
 
+	/**
+	 * 验证标记
+	 */
 	@Column(name = "VERIFY_", length = 10)
 	protected String verify;
 
+	/**
+	 * 删除标记
+	 */
+	@Column(name = "REMOVEFLAG_", length = 10)
+	protected String removeFlag;
+
+	/**
+	 * 初始化标记
+	 */
 	@Column(name = "INITFLAG_", length = 10)
 	protected String initFlag;
 
+	/**
+	 * 提供者类名
+	 */
 	@Column(name = "PROVIDERCLASS_", length = 100)
 	protected String providerClass;
+
+	/**
+	 * 远程地址
+	 */
+	@Column(name = "REMOTEURL_", length = 500)
+	protected String remoteUrl;
+
+	/**
+	 * 顺序号
+	 */
+	@Column(name = "SORTNO_")
+	protected int sort;
 
 	@Column(name = "CREATEBY_", length = 50)
 	protected String createBy;
@@ -144,6 +324,51 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 			actorIds = new HashSet<String>();
 		}
 		actorIds.add(actorId);
+	}
+
+	@Override
+	public Database clone() {
+		Database model = new Database();
+		model.setActive(this.getActive());
+		model.setCode(this.getCode());
+		model.setConnectionString(this.getConnectionString());
+		model.setCreateBy(this.getCreateBy());
+		model.setCreateTime(this.getCreateTime());
+		model.setDbname(this.getDbname());
+		model.setBucket(this.getBucket());
+		model.setHost(this.getHost());
+		model.setId(this.getId());
+		model.setInitFlag(this.getInitFlag());
+		model.setIntToken(this.getIntToken());
+		model.setToken(this.getToken());
+		model.setLevel(this.getLevel());
+		model.setKey(this.getKey());
+		model.setMapping(this.getMapping());
+		model.setName(this.getName());
+		model.setParentId(this.getParentId());
+		model.setOperation(this.getOperation());
+		model.setPassword(this.getPassword());
+		model.setPort(this.getPort());
+		model.setPriority(this.getPriority());
+		model.setProviderClass(this.getProviderClass());
+		model.setTitle(this.getTitle());
+		model.setType(this.getType());
+		model.setUpdateBy(this.getUpdateBy());
+		model.setUpdateTime(this.getUpdateTime());
+		model.setUser(this.getUser());
+		model.setVerify(this.getVerify());
+		model.setCatalog(this.getCatalog());
+		model.setInfoServer(this.getInfoServer());
+		model.setLoginAs(this.getLoginAs());
+		model.setLoginUrl(this.getLoginUrl());
+		model.setTicket(this.getTicket());
+		model.setProgramId(this.getProgramId());
+		model.setProgramName(this.getProgramName());
+		model.setUserNameKey(this.getUserNameKey());
+		model.setServerId(this.getServerId());
+		model.setSysId(this.getSysId());
+		model.setQueueName(this.getQueueName());
+		return model;
 	}
 
 	public int compareTo(Database other) {
@@ -191,6 +416,14 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		return actorIds;
 	}
 
+	public String getBucket() {
+		return bucket;
+	}
+
+	public String getCatalog() {
+		return catalog;
+	}
+
 	public String getCode() {
 		return code;
 	}
@@ -211,6 +444,10 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		return dbname;
 	}
 
+	public String getDiscriminator() {
+		return discriminator;
+	}
+
 	public String getHost() {
 		return this.host;
 	}
@@ -219,8 +456,20 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		return this.id;
 	}
 
+	public String getInfoServer() {
+		return infoServer;
+	}
+
 	public String getInitFlag() {
 		return initFlag;
+	}
+
+	public int getIntToken() {
+		if (intToken < 1000 || intToken > 9999) {
+			Random r = new Random();
+			intToken = Math.abs(1000 + r.nextInt(8999));
+		}
+		return intToken;
 	}
 
 	public String getKey() {
@@ -231,12 +480,24 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		return level;
 	}
 
+	public String getLoginAs() {
+		return loginAs;
+	}
+
+	public String getLoginUrl() {
+		return loginUrl;
+	}
+
+	public String getMapping() {
+		return mapping;
+	}
+
 	public String getName() {
 		return name;
 	}
 
-	public Long getNodeId() {
-		return this.nodeId;
+	public long getParentId() {
+		return this.parentId;
 	}
 
 	public int getOperation() {
@@ -247,7 +508,7 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		return this.password;
 	}
 
-	public Integer getPort() {
+	public int getPort() {
 		return this.port;
 	}
 
@@ -255,12 +516,68 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		return priority;
 	}
 
+	public String getProgramId() {
+		return programId;
+	}
+
+	public String getProgramName() {
+		return programName;
+	}
+
 	public String getProviderClass() {
 		return providerClass;
 	}
 
+	public String getQueueName() {
+		if (queueName == null) {
+			/*if (this.getHost() != null && this.getDbname() != null) {
+				queueName = this.getHost() + "_" + this.getDbname();
+				queueName = StringTools.replace(queueName, ".", "_");
+				queueName = queueName.toLowerCase();
+			}*/
+			queueName = this.getSysId();
+		}
+		return queueName;
+	}
+
+	public String getRemoteUrl() {
+		return remoteUrl;
+	}
+
+	public String getRemoveFlag() {
+		return removeFlag;
+	}
+
+	public String getRunType() {
+		return runType;
+	}
+
+	public String getSection() {
+		return section;
+	}
+
+	public long getServerId() {
+		return serverId;
+	}
+
+	public int getSort() {
+		return sort;
+	}
+
+	public String getSysId() {
+		return sysId;
+	}
+
+	public String getTicket() {
+		return ticket;
+	}
+
 	public String getTitle() {
 		return title;
+	}
+
+	public String getToken() {
+		return token;
 	}
 
 	public String getType() {
@@ -277,6 +594,14 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 
 	public String getUser() {
 		return this.user;
+	}
+
+	public String getUserNameKey() {
+		return userNameKey;
+	}
+
+	public String getUseType() {
+		return useType;
 	}
 
 	public String getVerify() {
@@ -307,6 +632,14 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		this.actorIds = actorIds;
 	}
 
+	public void setBucket(String bucket) {
+		this.bucket = bucket;
+	}
+
+	public void setCatalog(String catalog) {
+		this.catalog = catalog;
+	}
+
 	public void setCode(String code) {
 		this.code = code;
 	}
@@ -327,6 +660,10 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		this.dbname = dbname;
 	}
 
+	public void setDiscriminator(String discriminator) {
+		this.discriminator = discriminator;
+	}
+
 	public void setHost(String host) {
 		this.host = host;
 	}
@@ -335,8 +672,16 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		this.id = id;
 	}
 
+	public void setInfoServer(String infoServer) {
+		this.infoServer = infoServer;
+	}
+
 	public void setInitFlag(String initFlag) {
 		this.initFlag = initFlag;
+	}
+
+	public void setIntToken(int intToken) {
+		this.intToken = intToken;
 	}
 
 	public void setKey(String key) {
@@ -347,12 +692,24 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		this.level = level;
 	}
 
+	public void setLoginAs(String loginAs) {
+		this.loginAs = loginAs;
+	}
+
+	public void setLoginUrl(String loginUrl) {
+		this.loginUrl = loginUrl;
+	}
+
+	public void setMapping(String mapping) {
+		this.mapping = mapping;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setNodeId(Long nodeId) {
-		this.nodeId = nodeId;
+	public void setParentId(long parentId) {
+		this.parentId = parentId;
 	}
 
 	public void setOperation(int operation) {
@@ -363,7 +720,7 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		this.password = password;
 	}
 
-	public void setPort(Integer port) {
+	public void setPort(int port) {
 		this.port = port;
 	}
 
@@ -371,12 +728,60 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		this.priority = priority;
 	}
 
+	public void setProgramId(String programId) {
+		this.programId = programId;
+	}
+
+	public void setProgramName(String programName) {
+		this.programName = programName;
+	}
+
 	public void setProviderClass(String providerClass) {
 		this.providerClass = providerClass;
 	}
 
+	public void setQueueName(String queueName) {
+		this.queueName = queueName;
+	}
+
+	public void setRemoteUrl(String remoteUrl) {
+		this.remoteUrl = remoteUrl;
+	}
+
+	public void setRemoveFlag(String removeFlag) {
+		this.removeFlag = removeFlag;
+	}
+
+	public void setRunType(String runType) {
+		this.runType = runType;
+	}
+
+	public void setSection(String section) {
+		this.section = section;
+	}
+
+	public void setServerId(long serverId) {
+		this.serverId = serverId;
+	}
+
+	public void setSort(int sort) {
+		this.sort = sort;
+	}
+
+	public void setSysId(String sysId) {
+		this.sysId = sysId;
+	}
+
+	public void setTicket(String ticket) {
+		this.ticket = ticket;
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public void setType(String type) {
@@ -395,6 +800,14 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 		this.user = user;
 	}
 
+	public void setUserNameKey(String userNameKey) {
+		this.userNameKey = userNameKey;
+	}
+
+	public void setUseType(String useType) {
+		this.useType = useType;
+	}
+
 	public void setVerify(String verify) {
 		this.verify = verify;
 	}
@@ -409,8 +822,7 @@ public class Database implements java.lang.Comparable<Database>, Serializable,
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this,
-				ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 }

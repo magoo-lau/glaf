@@ -230,7 +230,7 @@ public class MxSysDataTableServiceImpl implements ISysDataTableService {
 
 		TableModel tableModel = new TableModel();
 		tableModel.setTableName(query.getTablename());
-		tableModel.setDataRequest(query.getDataRequest());
+		//tableModel.setDataRequest(query.getDataRequest());
 		int total = tableDataMapper.getTableCountByConditions(tableModel);
 		if (total > 0) {
 			result.put("total", total);
@@ -323,7 +323,7 @@ public class MxSysDataTableServiceImpl implements ISysDataTableService {
 	public int getTableDataCount(SysDataTableQuery query) {
 		TableModel q = new TableModel();
 		q.setTableName(query.getTablename());
-		q.setDataRequest(query.getDataRequest());
+		//q.setDataRequest(query.getDataRequest());
 
 		SysDataTable dataTable = this.getDataTableByName(query.getTablename());
 		if (dataTable != null && dataTable.getFields() != null) {

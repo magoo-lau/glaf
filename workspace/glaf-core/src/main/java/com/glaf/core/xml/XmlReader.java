@@ -191,10 +191,7 @@ public class XmlReader {
 						element.attributeValue("treeSupport"))) {
 					tableDefinition.setTreeSupport(true);
 				}
-
-				tableDefinition.setAggregationKeys(element
-						.attributeValue("aggregationKeys"));
-
+ 
 				tableDefinition.setModuleName(element
 						.attributeValue("moduleName"));
 

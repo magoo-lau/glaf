@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.glaf.generator.tools;
 
 import java.io.*;
@@ -9,12 +27,10 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 
-import com.glaf.core.base.ClassDefinition;
-import com.glaf.core.base.FieldDefinition;
 import com.glaf.core.domain.ColumnDefinition;
 import com.glaf.core.domain.TableDefinition;
-import com.glaf.core.xml.*;
 import com.glaf.core.util.*;
+import com.glaf.generator.xml.XmlWriter;
 
 public class Pdm2XmlMapping {
 	public final static String newline = System.getProperty("line.separator");
@@ -69,19 +85,18 @@ public class Pdm2XmlMapping {
 					continue;
 				}
 
-				entityName = StringTools.replace(entityName, "_", "");
-				entityName = StringTools.upper(entityName);
+				// entityName = StringTools.replace(entityName, "_", "");
+				// entityName = StringTools.upper(entityName);
 
 				System.out.println("------------------------------");
 				System.out.println(title + " [" + entityName + "]");
 
-				ClassDefinition classDefinition = new TableDefinition();
-				classDefinition.setTableName(table.toUpperCase());
-				classDefinition.setTitle(title);
-				classDefinition.setEntityName(entityName);
-				classDefinition.setEnglishTitle(entityName);
-				classDefinition.setPackageName("com.glaf.apps."
-						+ entityName.toLowerCase());
+				TableDefinition tableDefinition = new TableDefinition();
+				tableDefinition.setTableName(table.toUpperCase());
+				tableDefinition.setTitle(title);
+				tableDefinition.setEntityName(entityName);
+				tableDefinition.setEnglishTitle(entityName);
+				tableDefinition.setPackageName("com.glaf.apps." + entityName.toLowerCase());
 
 				Map<String, String> idMap = new HashMap<String, String>();
 
@@ -99,8 +114,8 @@ public class Pdm2XmlMapping {
 						idMap.put(id, colName);
 
 						String name = StringTools.lower(colName);
-						name = StringTools.replace(name, "_", "");
-						FieldDefinition field = new ColumnDefinition();
+						// name = StringTools.replace(name, "_", "");
+						ColumnDefinition field = new ColumnDefinition();
 						field.setColumnName(colName.toUpperCase());
 						field.setName(name);
 						field.setTitle(colLabel);
@@ -114,8 +129,7 @@ public class Pdm2XmlMapping {
 								|| StringUtils.startsWith(dataType, "FLOAT")) {
 							field.setDataType(FieldType.DOUBLE_TYPE);
 							field.setType("Double");
-						} else if (StringUtils.startsWith(dataType, "INT")
-								|| StringUtils.startsWith(dataType, "INT2")
+						} else if (StringUtils.startsWith(dataType, "INT") || StringUtils.startsWith(dataType, "INT2")
 								|| StringUtils.startsWith(dataType, "INT4")
 								|| StringUtils.startsWith(dataType, "INTEGER")
 								|| StringUtils.startsWith(dataType, "SMALLINT")) {
@@ -123,8 +137,7 @@ public class Pdm2XmlMapping {
 							field.setType("Integer");
 						} else if (StringUtils.startsWith(dataType, "DATE")
 								|| StringUtils.startsWith(dataType, "DATETIME")
-								|| StringUtils
-										.startsWith(dataType, "TIMESTAMP")) {
+								|| StringUtils.startsWith(dataType, "TIMESTAMP")) {
 							field.setDataType(FieldType.TIMESTAMP_TYPE);
 							field.setType("Date");
 						} else if (StringUtils.startsWith(dataType, "BIGINT")
@@ -142,38 +155,30 @@ public class Pdm2XmlMapping {
 						}
 						field.setDisplayType(4);
 						field.setEditable(true);
-						classDefinition.addField(field);
+						tableDefinition.addField(field);
 					}
 				}
 
 				Element primaryKey = element.element("PrimaryKey");
 				if (primaryKey != null) {
 					if (primaryKey.element("Key") != null) {
-						String ref = primaryKey.element("Key").attributeValue(
-								"Ref");
+						String ref = primaryKey.element("Key").attributeValue("Ref");
 						if (element.element("Keys") != null) {
-							List<?> keys = element.element("Keys").elements(
-									"Key");
+							List<?> keys = element.element("Keys").elements("Key");
 							Iterator<?> iiii = keys.iterator();
 							while (iiii.hasNext()) {
 								Element e = (Element) iiii.next();
 								if (ref.equals(e.attributeValue("Id"))) {
 									if (e.element("Key.Columns") != null
-											&& e.element("Key.Columns")
-													.element("Column") != null) {
-										String id = e.element("Key.Columns")
-												.element("Column")
-												.attributeValue("Ref");
+											&& e.element("Key.Columns").element("Column") != null) {
+										String id = e.element("Key.Columns").element("Column").attributeValue("Ref");
 										String colName = idMap.get(id);
-										String name = StringTools
-												.lower(colName);
-										name = StringTools.replace(name, "_",
-												"");
-										FieldDefinition idField = classDefinition
-												.getFields().get(name);
-										classDefinition.setIdField(idField);
-										classDefinition.getFields()
-												.remove(name);
+										String name = StringTools.lower(colName);
+										// name = StringTools.replace(name, "_",
+										// "");
+										ColumnDefinition idField = tableDefinition.getFields().get(name);
+										tableDefinition.setIdField(idField);
+										tableDefinition.getFields().remove(name);
 										break;
 									}
 								}
@@ -200,20 +205,22 @@ public class Pdm2XmlMapping {
 				format.setSuppressDeclaration(true);
 
 				XmlWriter xmlWriter = new XmlWriter();
-				Document d = xmlWriter.write(classDefinition);
+				Document d = xmlWriter.write(tableDefinition);
 				byte[] bytes = Dom4jUtils.getBytesFromDocument(d, format);
 				FileUtils.save(toFile, bytes);
-				
-				System.out.println("gen mapping file:"+toFile);
+
+				System.out.println("gen mapping file:" + toFile);
 
 			}
 
 		} else {
 			if (file.isDirectory()) {
 				String[] filelist = file.list(); // 列出所有的子文件（夹）名字
-				for (int i = 0; i < filelist.length; i++) {
-					File f = new File(file.getPath() + "/" + filelist[i]);
-					this.convert(f);
+				if (filelist != null) {
+					for (int i = 0; i < filelist.length; i++) {
+						File f = new File(file.getPath() + "/" + filelist[i]);
+						this.convert(f);
+					}
 				}
 			}
 		}

@@ -39,9 +39,14 @@ public interface DatabaseMapper {
 	int getDatabaseCount(DatabaseQuery query);
 
 	List<Database> getDatabases(DatabaseQuery query);
+	
+	List<Database> getDatabasesByActorId(String actorId);
 
 	void insertDatabase(Database model);
 
 	void updateDatabase(Database model);
 
+	void verifyDatabase(Database model);
+	
+	Database getDatabaseBySysId(String sysId);
 }

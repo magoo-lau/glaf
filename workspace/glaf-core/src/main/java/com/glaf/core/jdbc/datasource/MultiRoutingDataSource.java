@@ -89,7 +89,7 @@ public class MultiRoutingDataSource extends AbstractRoutingDataSource implements
 								}
 							}
 						} catch (Exception ex) {
-							ex.printStackTrace();
+							
 							logger.error(ex);
 						}
 					}
@@ -113,7 +113,7 @@ public class MultiRoutingDataSource extends AbstractRoutingDataSource implements
 
 			} catch (Exception ex) {
 				logger.error(ex);
-				ex.printStackTrace();
+				
 				throw new RuntimeException(ex);
 			} finally {
 				loading.set(false);

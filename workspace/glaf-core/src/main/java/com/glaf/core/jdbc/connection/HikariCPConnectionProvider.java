@@ -22,6 +22,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -40,10 +42,11 @@ import com.glaf.core.util.PropertiesHelper;
 
 public class HikariCPConnectionProvider implements ConnectionProvider {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(HikariCPConnectionProvider.class);
+	private static final Logger log = LoggerFactory.getLogger(HikariCPConnectionProvider.class);
 
 	protected final static Configuration conf = BaseConfiguration.create();
+
+	protected static int MAX_RETRIES = conf.getInt("jdbc.connection.retryCount", 10);
 
 	private volatile HikariDataSource ds;
 
@@ -77,24 +80,18 @@ public class HikariCPConnectionProvider implements ConnectionProvider {
 			}
 		}
 
-		String jdbcDriverClass = properties
-				.getProperty(DBConfiguration.JDBC_DRIVER);
+		String jdbcDriverClass = properties.getProperty(DBConfiguration.JDBC_DRIVER);
 		String jdbcUrl = properties.getProperty(DBConfiguration.JDBC_URL);
-		Properties connectionProps = ConnectionProviderFactory
-				.getConnectionProperties(properties);
+		Properties connectionProps = ConnectionProviderFactory.getConnectionProperties(properties);
 
-		log.info("HikariCP using driver: " + jdbcDriverClass + " at URL: "
-				+ jdbcUrl);
-		log.info("Connection properties: "
-				+ PropertiesHelper.maskOut(connectionProps, "password"));
+		log.info("HikariCP using driver: " + jdbcDriverClass + " at URL: " + jdbcUrl);
+		log.info("Connection properties: " + PropertiesHelper.maskOut(connectionProps, "password"));
 
-		autocommit = PropertiesHelper.getBoolean(
-				DBConfiguration.JDBC_AUTOCOMMIT, properties);
+		autocommit = PropertiesHelper.getBoolean(DBConfiguration.JDBC_AUTOCOMMIT, properties);
 		log.info("autocommit mode: " + autocommit);
 
 		if (jdbcDriverClass == null) {
-			log.warn("No JDBC Driver class was specified by property "
-					+ DBConfiguration.JDBC_DRIVER);
+			log.warn("No JDBC Driver class was specified by property " + DBConfiguration.JDBC_DRIVER);
 		} else {
 			try {
 				Class.forName(jdbcDriverClass);
@@ -102,8 +99,7 @@ public class HikariCPConnectionProvider implements ConnectionProvider {
 				try {
 					ClassUtils.classForName(jdbcDriverClass);
 				} catch (Exception e) {
-					String msg = "JDBC Driver class not found: "
-							+ jdbcDriverClass;
+					String msg = "JDBC Driver class not found: " + jdbcDriverClass;
 					log.error(msg, e);
 					throw new RuntimeException(msg, e);
 				}
@@ -111,31 +107,16 @@ public class HikariCPConnectionProvider implements ConnectionProvider {
 		}
 
 		try {
+			String validationQuery = properties.getProperty(ConnectionConstants.PROP_VALIDATIONQUERY);
+			Integer maximumPoolSize = PropertiesHelper.getInteger("hikari.maximumPoolSize", properties);
+			Integer connectionTimeout = PropertiesHelper.getInteger("hikari.connectionTimeout", properties);
 
-			String validationQuery = properties
-					.getProperty(ConnectionConstants.PROP_VALIDATIONQUERY);
-
-			Integer initialPoolSize = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_INITIALSIZE, properties);
-			Integer minPoolSize = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_MINACTIVE, properties);
-			Integer maxPoolSize = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_MAXACTIVE, properties);
-			if (initialPoolSize == null && minPoolSize != null) {
-				properties.put(ConnectionConstants.PROP_INITIALSIZE, String
-						.valueOf(minPoolSize).trim());
-			}
-
-			Integer maxWait = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_MAXWAIT, properties);
-
-			if (maxPoolSize == null) {
-				maxPoolSize = 50;
+			if (maximumPoolSize == null) {
+				maximumPoolSize = 50;
 			}
 
 			String dbUser = properties.getProperty(DBConfiguration.JDBC_USER);
-			String dbPassword = properties
-					.getProperty(DBConfiguration.JDBC_PASSWORD);
+			String dbPassword = properties.getProperty(DBConfiguration.JDBC_PASSWORD);
 
 			if (dbUser == null) {
 				dbUser = "";
@@ -150,26 +131,23 @@ public class HikariCPConnectionProvider implements ConnectionProvider {
 			config.setJdbcUrl(jdbcUrl);
 			config.setUsername(dbUser);
 			config.setPassword(dbPassword);
-			config.setMaximumPoolSize(maxPoolSize);
+			config.setMaximumPoolSize(maximumPoolSize);
 			config.setDataSourceProperties(properties);
 			if (StringUtils.isNotEmpty(validationQuery)) {
 				config.setConnectionTestQuery(validationQuery);
 			}
-			if (maxWait != null) {
-				config.setConnectionTimeout(maxWait * 1000L);
+			if (connectionTimeout != null) {
+				config.setConnectionTimeout(connectionTimeout);
 			}
 
 			config.setMaxLifetime(1000L * 3600 * 8);
 
-			String isolationLevel = properties
-					.getProperty(DBConfiguration.JDBC_ISOLATION);
+			String isolationLevel = properties.getProperty(DBConfiguration.JDBC_ISOLATION);
 			if (isolationLevel == null) {
 				isolation = null;
 			} else {
 				isolation = new Integer(isolationLevel);
-				log.info("JDBC isolation level: "
-						+ DBConfiguration.isolationLevelToString(isolation
-								.intValue()));
+				log.info("JDBC isolation level: " + DBConfiguration.isolationLevelToString(isolation.intValue()));
 			}
 
 			if (StringUtils.isNotEmpty(isolationLevel)) {
@@ -179,21 +157,17 @@ public class HikariCPConnectionProvider implements ConnectionProvider {
 			ds = new HikariDataSource(config);
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			log.error("could not instantiate HikariCP connection pool", ex);
-			throw new RuntimeException(
-					"Could not instantiate HikariCP connection pool", ex);
+			throw new RuntimeException("Could not instantiate HikariCP connection pool", ex);
 		}
 
 		Connection conn = null;
 		try {
 			conn = ds.getConnection();
 			if (conn == null) {
-				throw new RuntimeException(
-						"HikariCP connection pool can't get jdbc connection");
+				throw new RuntimeException("HikariCP connection pool can't get jdbc connection");
 			}
 		} catch (SQLException ex) {
-			ex.printStackTrace();
 			throw new RuntimeException(ex);
 		} finally {
 			JdbcUtils.close(conn);
@@ -203,39 +177,32 @@ public class HikariCPConnectionProvider implements ConnectionProvider {
 
 	public Connection getConnection() throws SQLException {
 		Connection connection = null;
-		int count = 0;
-		while (count < conf.getInt("jdbc.connection.retryCount", 10)) {
+		int retries = 0;
+		while (retries < MAX_RETRIES) {
 			try {
 				connection = ds.getConnection();
 				if (connection != null) {
 					if (isolation != null) {
-						connection
-								.setTransactionIsolation(isolation.intValue());
+						connection.setTransactionIsolation(isolation.intValue());
 					}
 					if (connection.getAutoCommit() != autocommit) {
 						connection.setAutoCommit(autocommit);
 					}
 					return connection;
 				} else {
-					count++;
+					retries++;
 					try {
-						Thread.sleep(conf.getInt("jdbc.connection.retryTimeMs",
-								500));
+						TimeUnit.MILLISECONDS.sleep(200 + new Random().nextInt(1000));// 活锁，随机等待
 					} catch (InterruptedException e) {
-						e.printStackTrace();
 					}
 				}
 			} catch (SQLException ex) {
-				count++;
-				try {
-					Thread.sleep(conf
-							.getInt("jdbc.connection.retryTimeMs", 500));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				if (retries++ == MAX_RETRIES) {
+					throw new SQLException("hikariCP can't getConnection", ex);
 				}
-				if (count >= conf.getInt("jdbc.connection.retryCount", 10)) {
-					ex.printStackTrace();
-					throw ex;
+				try {
+					TimeUnit.MILLISECONDS.sleep(200 + new Random().nextInt(1000));// 活锁，随机等待
+				} catch (InterruptedException e) {
 				}
 			}
 		}

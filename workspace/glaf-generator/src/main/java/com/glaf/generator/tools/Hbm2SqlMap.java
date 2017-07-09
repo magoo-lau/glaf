@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.glaf.generator.tools;
 
 import java.io.*;
@@ -75,18 +93,15 @@ public class Hbm2SqlMap {
 				String alias = name;
 				String className = name;
 				if (name.indexOf('.') != -1) {
-					alias = name.substring(name.lastIndexOf('.') + 1,
-							name.length());
+					alias = name.substring(name.lastIndexOf('.') + 1, name.length());
 					className = alias;
 					char ch = alias.charAt(0);
-					alias = String.valueOf(ch).toLowerCase()
-							+ alias.substring(1, alias.length());
+					alias = String.valueOf(ch).toLowerCase() + alias.substring(1, alias.length());
 				} else {
 					if (pkg != null) {
 						name = pkg + "." + name;
 						char ch = alias.charAt(0);
-						alias = String.valueOf(ch).toLowerCase()
-								+ alias.substring(1, alias.length());
+						alias = String.valueOf(ch).toLowerCase() + alias.substring(1, alias.length());
 					}
 				}
 
@@ -110,8 +125,7 @@ public class Hbm2SqlMap {
 					pk_type = idElement.attributeValue("type");
 					if (pk_column == null) {
 						if (idElement.element("column") != null) {
-							pk_column = idElement.element("column")
-									.attributeValue("name");
+							pk_column = idElement.element("column").attributeValue("name");
 						}
 					}
 					typeMap.put(pk_column, pk_type);
@@ -137,8 +151,7 @@ public class Hbm2SqlMap {
 					String column = elem.attributeValue("column");
 					if (column == null) {
 						if (elem.element("column") != null) {
-							column = elem.element("column").attributeValue(
-									"name");
+							column = elem.element("column").attributeValue("name");
 						}
 					}
 					if (column == null) {
@@ -159,14 +172,12 @@ public class Hbm2SqlMap {
 				insert.addAttribute("id", "insert" + className);
 				insert.addAttribute("parameterClass", alias);
 
-				StringBuffer buffer = new StringBuffer();
-				buffer.append(newline).append("\t\t INSERT INTO ")
-						.append(table);
+				StringBuilder buffer = new StringBuilder();
+				buffer.append(newline).append("\t\t INSERT INTO ").append(table);
 				buffer.append(" ( ").append(pk_column).append(", ");
 
-				StringBuffer sb = new StringBuffer();
-				sb.append(newline).append("\t\t VALUES ( #")
-						.append(pk_property).append("#, ");
+				StringBuilder sb = new StringBuilder();
+				sb.append(newline).append("\t\t VALUES ( #").append(pk_property).append("#, ");
 
 				Set<Entry<String, String>> entrySet = colMap.entrySet();
 				for (Entry<String, String> entry : entrySet) {
@@ -193,13 +204,11 @@ public class Hbm2SqlMap {
 				dynamicInsert.addAttribute("parameterClass", alias);
 
 				buffer.delete(0, buffer.length());
-				buffer.append(newline).append("\t\t INSERT INTO ")
-						.append(table);
+				buffer.append(newline).append("\t\t INSERT INTO ").append(table);
 				buffer.append(" ( ").append(pk_column).append(' ');
 
 				sb.delete(0, sb.length());
-				sb.append(newline).append("\t\t VALUES ( #")
-						.append(pk_property).append("#, ");
+				sb.append(newline).append("\t\t VALUES ( #").append(pk_property).append("#, ");
 
 				dynamicInsert.addText(buffer.toString());
 
@@ -210,15 +219,13 @@ public class Hbm2SqlMap {
 				for (Entry<String, String> entry : entrySet) {
 					String p = entry.getValue();
 					String col = entry.getKey();
-					Element isPropertyAvailable = dynamicx
-							.addElement("isPropertyAvailable");
+					Element isPropertyAvailable = dynamicx.addElement("isPropertyAvailable");
 					isPropertyAvailable.addAttribute("prepend", ",");
 					isPropertyAvailable.addAttribute("property", p);
 					isPropertyAvailable.setText(col);
 				}
 
-				dynamicInsert.addText(newline + "\t\t ) VALUES ( #"
-						+ pk_property + "# ");
+				dynamicInsert.addText(newline + "\t\t ) VALUES ( #" + pk_property + "# ");
 
 				Element dynamicy = dynamicInsert.addElement("dynamic");
 				dynamicy.addAttribute("prepend", "");
@@ -226,8 +233,7 @@ public class Hbm2SqlMap {
 				entrySet = colMap.entrySet();
 				for (Entry<String, String> entry : entrySet) {
 					String p = entry.getValue();
-					Element isPropertyAvailable = dynamicy
-							.addElement("isPropertyAvailable");
+					Element isPropertyAvailable = dynamicy.addElement("isPropertyAvailable");
 					isPropertyAvailable.addAttribute("prepend", ",");
 					isPropertyAvailable.addAttribute("property", p);
 					isPropertyAvailable.setText("#" + p + "#");
@@ -250,15 +256,13 @@ public class Hbm2SqlMap {
 				for (Entry<String, String> entry : entrySet) {
 					String p = entry.getValue();
 					String col = entry.getKey();
-					Element isPropertyAvailable = dynamic
-							.addElement("isPropertyAvailable");
+					Element isPropertyAvailable = dynamic.addElement("isPropertyAvailable");
 					isPropertyAvailable.addAttribute("prepend", ",");
 					isPropertyAvailable.addAttribute("property", p);
 					isPropertyAvailable.addText(col + " = #" + p + "#");
 				}
 
-				update.addText(newline + "\t\t WHERE " + pk_column + " = #"
-						+ pk_property + "# ");
+				update.addText(newline + "\t\t WHERE " + pk_column + " = #" + pk_property + "# ");
 
 				/**
 				 * 根据主键删除数据
@@ -274,8 +278,8 @@ public class Hbm2SqlMap {
 				} else {
 					delete.addAttribute("parameterClass", "java.lang.String");
 				}
-				delete.addText(newline + "\t\t DELETE FROM " + table
-						+ " WHERE " + pk_column + " = #" + pk_property + "# ");
+				delete.addText(
+						newline + "\t\t DELETE FROM " + table + " WHERE " + pk_column + " = #" + pk_property + "# ");
 
 				/**
 				 * 查询统计数据
@@ -340,8 +344,7 @@ public class Hbm2SqlMap {
 					}
 
 					if (op.trim().length() > 0) {
-						Element isPropertyAvailable = dynamic55
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic55.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "AND");
 						isPropertyAvailable.addAttribute("property", p);
 
@@ -350,8 +353,7 @@ public class Hbm2SqlMap {
 						isNotNull.addAttribute("property", p);
 						isNotNull.addText(expr);
 					} else {
-						Element isPropertyAvailable = dynamic55
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic55.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "AND");
 						isPropertyAvailable.addAttribute("property", p);
 						isPropertyAvailable.addText(expr);
@@ -372,8 +374,7 @@ public class Hbm2SqlMap {
 				iterate55.addAttribute("open", "(");
 				iterate55.addAttribute("close", ")");
 				iterate55.addAttribute("conjunction", "OR");
-				iterate55.addText(" ( " + pk_column + " = #" + pk_property
-						+ "s[]# ) ");
+				iterate55.addText(" ( " + pk_column + " = #" + pk_property + "s[]# ) ");
 
 				/**
 				 * 查询数据
@@ -438,8 +439,7 @@ public class Hbm2SqlMap {
 					}
 
 					if (op.trim().length() > 0) {
-						Element isPropertyAvailable = dynamic5
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic5.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "AND");
 						isPropertyAvailable.addAttribute("property", p);
 
@@ -448,8 +448,7 @@ public class Hbm2SqlMap {
 						isNotNull.addAttribute("property", p);
 						isNotNull.addText(expr);
 					} else {
-						Element isPropertyAvailable = dynamic5
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic5.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "AND");
 						isPropertyAvailable.addAttribute("property", p);
 						isPropertyAvailable.addText(expr);
@@ -470,8 +469,7 @@ public class Hbm2SqlMap {
 				iterate.addAttribute("open", "(");
 				iterate.addAttribute("close", ")");
 				iterate.addAttribute("conjunction", "OR");
-				iterate.addText(" ( " + pk_column + " = #" + pk_property
-						+ "s[]# ) ");
+				iterate.addText(" ( " + pk_column + " = #" + pk_property + "s[]# ) ");
 
 				/**
 				 * 产生Hibernate查询
@@ -535,19 +533,16 @@ public class Hbm2SqlMap {
 					}
 
 					if (op.trim().length() > 0) {
-						Element isPropertyAvailable = dynamic555
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic555.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "and");
 						isPropertyAvailable.addAttribute("property", p);
 
-						Element isNotNull555 = isPropertyAvailable
-								.addElement(op);
+						Element isNotNull555 = isPropertyAvailable.addElement(op);
 						isNotNull555.addAttribute("prepend", "");
 						isNotNull555.addAttribute("property", p);
 						isNotNull555.addText(expr);
 					} else {
-						Element isPropertyAvailable = dynamic555
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic555.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "and");
 						isPropertyAvailable.addAttribute("property", p);
 						isPropertyAvailable.addText(expr);
@@ -568,8 +563,7 @@ public class Hbm2SqlMap {
 				iterate555.addAttribute("open", "(");
 				iterate555.addAttribute("close", ")");
 				iterate555.addAttribute("conjunction", "or");
-				iterate555.addText(" ( a." + pk_property + " = #" + pk_property
-						+ "s[]# ) ");
+				iterate555.addText(" ( a." + pk_property + " = #" + pk_property + "s[]# ) ");
 			}
 
 			String filename = file.getName();
@@ -593,9 +587,11 @@ public class Hbm2SqlMap {
 		} else {
 			if (file.isDirectory()) {
 				String[] filelist = file.list(); // 列出所有的子文件（夹）名字
-				for (int i = 0; i < filelist.length; i++) {
-					File f = new File(file.getPath() + "/" + filelist[i]);
-					this.convert(f);
+				if (filelist != null) {
+					for (int i = 0; i < filelist.length; i++) {
+						File f = new File(file.getPath() + "/" + filelist[i]);
+						this.convert(f);
+					}
 				}
 			}
 		}

@@ -25,12 +25,28 @@ import org.springframework.transaction.annotation.Transactional;
 import com.glaf.core.domain.*;
 import com.glaf.core.query.*;
 
+/**
+ * 多数据库相关操作
+ *
+ */
 @Transactional(readOnly = true)
 public interface IDatabaseService {
 
+	/**
+	 * 新建一条用户的数据库访问权限
+	 * 
+	 * @param databaseId
+	 * @param actorId
+	 */
 	@Transactional
 	void createAccessor(long databaseId, String actorId);
 
+	/**
+	 * 删除一条用户的数据库访问权限
+	 * 
+	 * @param databaseId
+	 * @param actorId
+	 */
 	@Transactional
 	void deleteAccessor(long databaseId, String actorId);
 
@@ -50,21 +66,54 @@ public interface IDatabaseService {
 	@Transactional
 	void deleteByIds(List<Long> ids);
 
+	/**
+	 * 获取全部数据库访问权限
+	 * 
+	 * @return
+	 */
 	List<DatabaseAccess> getAllDatabaseAccesses();
 
 	/**
-	 * 根据主键获取一条记录
+	 * 获取某个数据库访问权限
+	 * 
+	 * @return
+	 */
+	List<DatabaseAccess> getDatabaseAccesses(long databaseId);
+
+	/**
+	 * 获取某个数据库访问用户
+	 * 
+	 * @return
+	 */
+	List<String> getDatabaseAccessors(long databaseId);
+
+	/**
+	 * 根据编码获取一条数据库信息
+	 * 
+	 * @return
+	 */
+	Database getDatabaseByCode(String code);
+
+	/**
+	 * 根据主键获取一条数据库信息
 	 * 
 	 * @return
 	 */
 	Database getDatabaseById(Long id);
 
 	/**
-	 * 根据编码获取一条记录
+	 * 根据mapping获取一条数据库信息
 	 * 
 	 * @return
 	 */
-	Database getDatabaseByCode(String code);
+	Database getDatabaseByMapping(String mapping);
+
+	/**
+	 * 根据名称获取一条数据库信息
+	 * 
+	 * @return
+	 */
+	Database getDatabaseByName(String name);
 
 	/**
 	 * 根据查询参数获取记录总数
@@ -73,22 +122,34 @@ public interface IDatabaseService {
 	 */
 	int getDatabaseCountByQueryCriteria(DatabaseQuery query);
 
+	/**
+	 * 获取全部数据库信息
+	 * 
+	 * @return
+	 */
 	List<Database> getDatabases();
 
 	/**
-	 * 根据查询参数获取记录列表
+	 * 获取某个用户能访问的数据库
 	 * 
 	 * @return
 	 */
 	List<Database> getDatabases(String actorId);
 
 	/**
-	 * 根据查询参数获取一页的数据
+	 * 根据查询参数获取一页的数据库
 	 * 
 	 * @return
 	 */
-	List<Database> getDatabasesByQueryCriteria(int start, int pageSize,
-			DatabaseQuery query);
+	List<Database> getDatabasesByQueryCriteria(int start, int pageSize, DatabaseQuery query);
+
+	/**
+	 * 保存一条数据库信息
+	 * 
+	 * @return
+	 */
+	@Transactional
+	void insert(Database database);
 
 	/**
 	 * 根据查询参数获取记录列表
@@ -98,7 +159,7 @@ public interface IDatabaseService {
 	List<Database> list(DatabaseQuery query);
 
 	/**
-	 * 保存一条记录
+	 * 保存一条数据库信息
 	 * 
 	 * @return
 	 */
@@ -106,7 +167,7 @@ public interface IDatabaseService {
 	void save(Database database);
 
 	/**
-	 * 保存数据库访问者
+	 * 保存某个数据库的访问者
 	 * 
 	 * @return
 	 */
@@ -114,14 +175,31 @@ public interface IDatabaseService {
 	void saveAccessors(long databaseId, Collection<String> accessors);
 
 	/**
-	 * 保存数据库访问者
+	 * 保存某个用户能访问的数据库列表
 	 * 
 	 * @return
 	 */
 	@Transactional
 	void saveAccessors(String accessor, Collection<Long> databaseIds);
 
+	/**
+	 * 
+	 * @param 修改一条数据库信息
+	 */
 	@Transactional
 	void update(Database database);
 
+	/**
+	 * 
+	 * @param 验证一条数据库信息
+	 */
+	@Transactional
+	void verify(Database database);
+
+	/**
+	 * 根据系统ID获取一条数据库信息
+	 * 
+	 * @return
+	 */
+	Database getDatabaseBySysId(String sysId);
 }

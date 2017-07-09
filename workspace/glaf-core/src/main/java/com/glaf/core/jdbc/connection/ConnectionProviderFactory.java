@@ -42,8 +42,7 @@ import com.glaf.core.util.ClassUtils;
 
 public final class ConnectionProviderFactory {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ConnectionProviderFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(ConnectionProviderFactory.class);
 
 	private static final ConcurrentMap<String, ConnectionProvider> providerCache = new ConcurrentHashMap<String, ConnectionProvider>();
 
@@ -95,11 +94,11 @@ public final class ConnectionProviderFactory {
 
 	private static boolean c3p0ProviderPresent() {
 		try {
-			ClassUtils
-					.classForName("com.glaf.core.jdbc.connection.C3P0ConnectionProvider");
+			ClassUtils.classForName("com.glaf.core.jdbc.connection.C3P0ConnectionProvider");
 		} catch (Exception e) {
-			log.warn("c3p0 properties is specificed, but could not find com.glaf.core.jdbc.connection.C3P0ConnectionProvider from the classpath, "
-					+ "these properties are going to be ignored.");
+			log.warn(
+					"c3p0 properties is specificed, but could not find com.glaf.core.jdbc.connection.C3P0ConnectionProvider from the classpath, "
+							+ "these properties are going to be ignored.");
 			return false;
 		}
 		return true;
@@ -107,11 +106,11 @@ public final class ConnectionProviderFactory {
 
 	private static boolean druidProviderPresent() {
 		try {
-			ClassUtils
-					.classForName("com.glaf.core.jdbc.connection.DruidConnectionProvider");
+			ClassUtils.classForName("com.glaf.core.jdbc.connection.DruidConnectionProvider");
 		} catch (Exception e) {
-			log.warn("druid properties is specificed, but could not find com.glaf.core.jdbc.connection.DruidConnectionProvider from the classpath, "
-					+ "these properties are going to be ignored.");
+			log.warn(
+					"druid properties is specificed, but could not find com.glaf.core.jdbc.connection.DruidConnectionProvider from the classpath, "
+							+ "these properties are going to be ignored.");
 			return false;
 		}
 		return true;
@@ -132,15 +131,13 @@ public final class ConnectionProviderFactory {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static ConnectionProvider createProvider(Properties properties,
-			Map connectionProviderInjectionData) {
+	private static ConnectionProvider createProvider(Properties properties, Map connectionProviderInjectionData) {
 		if (properties == null || properties.isEmpty()) {
 			return null;
 		}
 		log.debug("---------------------------ConnectionProvider create----------------");
 		ConnectionProvider provider = null;
-		String providerClass = properties
-				.getProperty(DBConfiguration.JDBC_PROVIDER);
+		String providerClass = properties.getProperty(DBConfiguration.JDBC_PROVIDER);
 		if (providerClass != null) {
 			provider = initializeConnectionProviderFromConfig(providerClass);
 		} else if (c3p0ConfigDefined(properties) && c3p0ProviderPresent()) {
@@ -151,41 +148,30 @@ public final class ConnectionProviderFactory {
 
 		if (provider == null) {
 			provider = initializeConnectionProviderFromConfig("com.glaf.core.jdbc.connection.DruidConnectionProvider");
-			if (StringUtils.equals(
-					properties.getProperty(DBConfiguration.JDBC_DRIVER),
-					"org.sqlite.JDBC")) {
-				provider = initializeConnectionProviderFromConfig("com.glaf.core.jdbc.connection.C3P0ConnectionProvider");
+			if (StringUtils.equals(properties.getProperty(DBConfiguration.JDBC_DRIVER), "org.sqlite.JDBC")) {
+				provider = initializeConnectionProviderFromConfig(
+						"com.glaf.core.jdbc.connection.C3P0ConnectionProvider");
 			}
 		}
 
-		if (connectionProviderInjectionData != null
-				&& connectionProviderInjectionData.size() != 0) {
+		if (connectionProviderInjectionData != null && connectionProviderInjectionData.size() != 0) {
 			try {
 				BeanInfo info = Introspector.getBeanInfo(provider.getClass());
 				PropertyDescriptor[] descritors = info.getPropertyDescriptors();
 				int size = descritors.length;
 				for (int index = 0; index < size; index++) {
 					String propertyName = descritors[index].getName();
-					if (connectionProviderInjectionData
-							.containsKey(propertyName)) {
+					if (connectionProviderInjectionData.containsKey(propertyName)) {
 						Method method = descritors[index].getWriteMethod();
-						method.invoke(provider,
-								new Object[] { connectionProviderInjectionData
-										.get(propertyName) });
+						method.invoke(provider, new Object[] { connectionProviderInjectionData.get(propertyName) });
 					}
 				}
 			} catch (IntrospectionException e) {
-				throw new RuntimeException(
-						"Unable to inject objects into the connection provider",
-						e);
+				throw new RuntimeException("Unable to inject objects into the connection provider", e);
 			} catch (IllegalAccessException e) {
-				throw new RuntimeException(
-						"Unable to inject objects into the connection provider",
-						e);
+				throw new RuntimeException("Unable to inject objects into the connection provider", e);
 			} catch (InvocationTargetException e) {
-				throw new RuntimeException(
-						"Unable to inject objects into the connection provider",
-						e);
+				throw new RuntimeException("Unable to inject objects into the connection provider", e);
 			}
 		}
 		provider.configure(properties);
@@ -194,16 +180,14 @@ public final class ConnectionProviderFactory {
 	}
 
 	public static ConnectionProvider createProvider(String systemName) {
-		Properties props = DBConfiguration
-				.getDataSourcePropertiesByName(systemName);
-		log.debug("ConnectionProvider@name=" + systemName);
+		Properties props = DBConfiguration.getDataSourcePropertiesByName(systemName);
+		// log.debug("ConnectionProvider@name=" + systemName);
 		// log.debug("ConnectionProvider@props=" + props);
 		ConnectionProvider model = createProvider(props);
 		return model;
 	}
 
-	public static ConnectionProvider createProvider(String systemName,
-			Properties properties) {
+	public static ConnectionProvider createProvider(String systemName, Properties properties) {
 		ConnectionProvider model = createProvider(properties);
 		return model;
 	}
@@ -213,10 +197,9 @@ public final class ConnectionProviderFactory {
 		Properties result = new Properties();
 		while (iter.hasNext()) {
 			String prop = (String) iter.next();
-			if (prop.startsWith(DBConfiguration.JDBC_DRIVER)
-					&& !SPECIAL_PROPERTIES.contains(prop)) {
-				result.setProperty(prop.substring(DBConfiguration.JDBC_PREFIX
-						.length() + 1), properties.getProperty(prop));
+			if (prop.startsWith(DBConfiguration.JDBC_DRIVER) && !SPECIAL_PROPERTIES.contains(prop)) {
+				result.setProperty(prop.substring(DBConfiguration.JDBC_PREFIX.length() + 1),
+						properties.getProperty(prop));
 			}
 		}
 		String userName = properties.getProperty(DBConfiguration.JDBC_USER);
@@ -230,18 +213,14 @@ public final class ConnectionProviderFactory {
 		return result;
 	}
 
-	private static ConnectionProvider initializeConnectionProviderFromConfig(
-			String providerClass) {
+	private static ConnectionProvider initializeConnectionProviderFromConfig(String providerClass) {
 		ConnectionProvider connections;
 		try {
 			log.info("Initializing connection provider: " + providerClass);
-			connections = (ConnectionProvider) ClassUtils.classForName(
-					providerClass).newInstance();
+			connections = (ConnectionProvider) ClassUtils.classForName(providerClass).newInstance();
 		} catch (Exception ex) {
 			log.error("Could not instantiate connection provider", ex);
-			throw new RuntimeException(
-					"Could not instantiate connection provider: "
-							+ providerClass);
+			throw new RuntimeException("Could not instantiate connection provider: " + providerClass);
 		}
 		return connections;
 	}

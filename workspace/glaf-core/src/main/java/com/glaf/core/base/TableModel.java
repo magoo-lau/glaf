@@ -20,10 +20,18 @@ package com.glaf.core.base;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.glaf.core.util.StringTools;
 
 public class TableModel implements java.io.Serializable {
 
@@ -39,6 +47,8 @@ public class TableModel implements java.io.Serializable {
 	protected int batchSize;
 
 	protected List<ColumnModel> columns = new java.util.ArrayList<ColumnModel>();
+
+	protected String dbType;
 
 	/**
 	 * 英文标题
@@ -66,6 +76,8 @@ public class TableModel implements java.io.Serializable {
 	 * 是否插入
 	 */
 	protected boolean insertOnly;
+
+	protected boolean updateAllowed = true;
 
 	/**
 	 * 合法数据的最小长度
@@ -100,6 +112,11 @@ public class TableModel implements java.io.Serializable {
 	protected String sql;
 
 	/**
+	 * 解析类型 json,xls,xml
+	 */
+	protected String exportType;
+
+	/**
 	 * 开始行数,从1开始
 	 */
 	protected int startRow;
@@ -130,14 +147,35 @@ public class TableModel implements java.io.Serializable {
 
 	protected String orderBy;
 
-	protected DataRequest dataRequest;
+	/**
+	 * 当前操作用户
+	 */
+	protected String actorId;
+
+	/**
+	 * where查询列
+	 */
+	protected List<ColumnModel> whereColumns = new java.util.ArrayList<ColumnModel>();
+
+	protected Map<String, String> attributes = new HashMap<String, String>();
+
+	/**
+	 * 预处理程序
+	 */
+	protected List<String> statements = new java.util.ArrayList<String>();
 
 	public TableModel() {
 
 	}
 
-	public void addCollectionColumn(String columnName,
-			Collection<Object> collection) {
+	public void addAttribute(String key, String value) {
+		if (attributes == null) {
+			attributes = new HashMap<String, String>();
+		}
+		attributes.put(key, value);
+	}
+
+	public void addCollectionColumn(String columnName, Collection<Object> collection) {
 		if (columns == null) {
 			columns = new java.util.ArrayList<ColumnModel>();
 		}
@@ -203,8 +241,25 @@ public class TableModel implements java.io.Serializable {
 		this.addColumn(columnName, "Long", value);
 	}
 
+	public void addStatement(String statement) {
+		if (statements == null) {
+			statements = new java.util.ArrayList<String>();
+		}
+		statements.add(statement);
+	}
+
 	public void addStringColumn(String columnName, String value) {
 		this.addColumn(columnName, "String", value);
+	}
+
+	public void addWhereColumn(ColumnModel column) {
+		if (whereColumns == null) {
+			whereColumns = new java.util.ArrayList<ColumnModel>();
+		}
+		if (!whereColumns.contains(column)) {
+			column.setTable(this);
+			whereColumns.add(column);
+		}
 	}
 
 	@Override
@@ -224,12 +279,28 @@ public class TableModel implements java.io.Serializable {
 		return true;
 	}
 
+	public String getActorId() {
+		return actorId;
+	}
+
 	public String getAggregationKey() {
 		return aggregationKey;
 	}
 
 	public Collection<String> getAggregationKeys() {
+		if (aggregationKeys == null) {
+			aggregationKeys = new HashSet<String>();
+		}
+		if (aggregationKeys.isEmpty()) {
+			if (StringUtils.isNotEmpty(aggregationKey)) {
+				aggregationKeys = StringTools.stringToCollection(aggregationKey);
+			}
+		}
 		return aggregationKeys;
+	}
+
+	public Map<String, String> getAttributes() {
+		return attributes;
 	}
 
 	public int getBatchSize() {
@@ -240,8 +311,8 @@ public class TableModel implements java.io.Serializable {
 		return columns;
 	}
 
-	public DataRequest getDataRequest() {
-		return dataRequest;
+	public String getDbType() {
+		return dbType;
 	}
 
 	public String getEnglishTitle() {
@@ -257,6 +328,10 @@ public class TableModel implements java.io.Serializable {
 			excludes = new java.util.ArrayList<String>();
 		}
 		return excludes;
+	}
+
+	public String getExportType() {
+		return exportType;
 	}
 
 	public String getFilePrefix() {
@@ -311,6 +386,10 @@ public class TableModel implements java.io.Serializable {
 		return startRow;
 	}
 
+	public List<String> getStatements() {
+		return statements;
+	}
+
 	public int getStopSkipRow() {
 		return stopSkipRow;
 	}
@@ -330,12 +409,15 @@ public class TableModel implements java.io.Serializable {
 		return title;
 	}
 
+	public List<ColumnModel> getWhereColumns() {
+		return whereColumns;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((tableName == null) ? 0 : tableName.hashCode());
+		result = prime * result + ((tableName == null) ? 0 : tableName.hashCode());
 		return result;
 	}
 
@@ -343,11 +425,19 @@ public class TableModel implements java.io.Serializable {
 		return insertOnly;
 	}
 
+	public boolean isUpdateAllowed() {
+		return updateAllowed;
+	}
+
 	public void removeColumn(ColumnModel column) {
 		if (columns != null) {
 			column.setTable(null);
 			columns.remove(column);
 		}
+	}
+
+	public void setActorId(String actorId) {
+		this.actorId = actorId;
 	}
 
 	public void setAggregationKey(String aggregationKey) {
@@ -358,6 +448,10 @@ public class TableModel implements java.io.Serializable {
 		this.aggregationKeys = aggregationKeys;
 	}
 
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
 	public void setBatchSize(int batchSize) {
 		this.batchSize = batchSize;
 	}
@@ -366,8 +460,8 @@ public class TableModel implements java.io.Serializable {
 		this.columns = columns;
 	}
 
-	public void setDataRequest(DataRequest dataRequest) {
-		this.dataRequest = dataRequest;
+	public void setDbType(String dbType) {
+		this.dbType = dbType;
 	}
 
 	public void setEnglishTitle(String englishTitle) {
@@ -380,6 +474,10 @@ public class TableModel implements java.io.Serializable {
 
 	public void setExcludes(List<String> excludes) {
 		this.excludes = excludes;
+	}
+
+	public void setExportType(String exportType) {
+		this.exportType = exportType;
 	}
 
 	public void setFilePrefix(String filePrefix) {
@@ -438,6 +536,10 @@ public class TableModel implements java.io.Serializable {
 		this.startRow = startRow;
 	}
 
+	public void setStatements(List<String> statements) {
+		this.statements = statements;
+	}
+
 	public void setStopSkipRow(int stopSkipRow) {
 		this.stopSkipRow = stopSkipRow;
 	}
@@ -454,9 +556,34 @@ public class TableModel implements java.io.Serializable {
 		this.title = title;
 	}
 
+	public void setUpdateAllowed(boolean updateAllowed) {
+		this.updateAllowed = updateAllowed;
+	}
+
+	public void setWhereColumns(List<ColumnModel> whereColumns) {
+		this.whereColumns = whereColumns;
+	}
+
+	public JSONObject toJsonObject() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("tableName", this.getTableName());
+		jsonObject.put("actorId", this.getActorId());
+		if (idColumn != null) {
+			jsonObject.put("id", idColumn.toJsonObject());
+		}
+		if (columns != null && !columns.isEmpty()) {
+			JSONArray array = new JSONArray();
+			for (ColumnModel col : columns) {
+				array.add(col.toJsonObject());
+			}
+			jsonObject.put("columns", array);
+		}
+
+		return jsonObject;
+	}
+
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this,
-				ToStringStyle.MULTI_LINE_STYLE);
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 }

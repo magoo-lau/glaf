@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.glaf.generator.tools;
 
 import java.util.List;
@@ -6,14 +24,13 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 
-import com.glaf.core.base.ClassDefinition;
-import com.glaf.core.base.FieldDefinition;
+import com.glaf.core.domain.ColumnDefinition;
 import com.glaf.core.domain.TableDefinition;
-import com.glaf.core.xml.XmlWriter;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.Dom4jUtils;
 import com.glaf.core.util.FileUtils;
 import com.glaf.core.util.StringTools;
+import com.glaf.generator.xml.XmlWriter;
 
 public class Database2XmlMapping {
 
@@ -27,7 +44,7 @@ public class Database2XmlMapping {
 			gen.setTodir("codegen/mapping");
 		}
 		gen.execute();
-		System.out.println("生成结束，请到" + gen.getTodir() + "查看输出。");
+		System.out.println("code gen " + gen.getTodir() + "");
 		System.exit(0);
 	}
 
@@ -40,41 +57,41 @@ public class Database2XmlMapping {
 			List<String> tables = DBUtils.getTables();
 			for (String tableName : tables) {
 				System.out.println("process " + tableName);
-				List<FieldDefinition> fields = DBUtils
-						.getFieldDefinitions(tableName);
+				List<ColumnDefinition> fields = DBUtils
+						.getColumnDefinitions(tableName);
 
-				ClassDefinition classDefinition = new TableDefinition();
-				classDefinition.setTableName(tableName.toLowerCase());
-				classDefinition.setTitle(StringTools.upper(StringTools
+				TableDefinition tableDefinition = new TableDefinition();
+				tableDefinition.setTableName(tableName.toLowerCase());
+				tableDefinition.setTitle(StringTools.upper(StringTools
 						.camelStyle(tableName)));
-				classDefinition.setEntityName(StringTools.upper(StringTools
+				tableDefinition.setEntityName(StringTools.upper(StringTools
 						.camelStyle(tableName)));
-				classDefinition
-						.setEnglishTitle(classDefinition.getEntityName());
-				// classDefinition.setPackageName("com.glaf.apps."
+				tableDefinition
+						.setEnglishTitle(tableDefinition.getEntityName());
+				// tableDefinition.setPackageName("com.glaf.apps."
 				// + StringTools.camelStyle(tableName));
 
-				classDefinition.setPackageName("com.glaf.apps");
+				tableDefinition.setPackageName("com.glaf.apps");
 
 				List<String> primaryKeys = DBUtils.getPrimaryKeys(tableName);
 
-				for (FieldDefinition f : fields) {
+				for (ColumnDefinition f : fields) {
 					System.out.println(tableName+"--"+f.getName());
 					f.setTitle(f.getName());
 					if (!primaryKeys.isEmpty()) {
 						if (primaryKeys.contains(f.getColumnName()) || primaryKeys.contains(f.getColumnName().toLowerCase()) || primaryKeys.contains(f.getColumnName().toUpperCase())) {
-							classDefinition.setIdField(f);
+							tableDefinition.setIdField(f);
 						} else {
 							f.setEditable(true);
-							classDefinition.addField(f);
+							tableDefinition.addField(f);
 						}
 					} else {
 						if (StringUtils.equalsIgnoreCase(f.getColumnName(),
 								"id")) {
-							classDefinition.setIdField(f);
+							tableDefinition.setIdField(f);
 						} else {
 							f.setEditable(true);
-							classDefinition.addField(f);
+							tableDefinition.addField(f);
 						}
 					}
 				}
@@ -89,12 +106,12 @@ public class Database2XmlMapping {
 				format.setNewLineAfterDeclaration(true);
 				format.setSuppressDeclaration(true);
 
-				String filename = classDefinition.getEntityName()+ ".mapping.xml";
+				String filename = tableDefinition.getEntityName()+ ".mapping.xml";
 
 				String toFile = todir + "/" + filename;
 
 				XmlWriter xmlWriter = new XmlWriter();
-				Document d = xmlWriter.write(classDefinition);
+				Document d = xmlWriter.write(tableDefinition);
 				byte[] bytes = Dom4jUtils.getBytesFromDocument(d, format);
 				FileUtils.save(toFile, bytes);
 

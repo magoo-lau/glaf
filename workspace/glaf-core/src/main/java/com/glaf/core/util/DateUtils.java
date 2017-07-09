@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class DateUtils {
 
 	public static final long SECOND = 1000L;
@@ -61,6 +63,8 @@ public class DateUtils {
 
 	public static final String YEAR_MONTH_DAY_FORMAT = "yyyyMMdd";
 
+	public static final String FULL_DATE_FORMAT = "yyyyMMddHHmmss";
+
 	/**
 	 * 判断某个时间time2是否在另一个时间time1之前
 	 * 
@@ -86,23 +90,20 @@ public class DateUtils {
 	 * @return
 	 */
 	public static long dateDiff(Date fromDate, Date toDate) {
-		return dateDiff(getDateTime(DATE_PATTERN, fromDate),
-				getDateTime(DATE_PATTERN, toDate));
+		return dateDiff(getDateTime(DATE_PATTERN, fromDate), getDateTime(DATE_PATTERN, toDate));
 	}
 
 	public static long dateDiff(String beginDateStr, String endDateStr) {
 		long day = 0;
-		java.text.SimpleDateFormat format = new java.text.SimpleDateFormat(
-				"yyyy-MM-dd");
+		java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		java.util.Date beginDate;
 		java.util.Date endDate;
 		try {
 			beginDate = format.parse(beginDateStr);
 			endDate = format.parse(endDateStr);
-			day = (endDate.getTime() - beginDate.getTime())
-					/ (24 * 60 * 60 * 1000);
+			day = (endDate.getTime() - beginDate.getTime()) / (24 * 60 * 60 * 1000);
 		} catch (java.text.ParseException ex) {
-			ex.printStackTrace();
+			
 		}
 		return day;
 	}
@@ -177,8 +178,7 @@ public class DateUtils {
 		if (pattern == null) {
 			pattern = DATE_TIME_PATTERN;
 		}
-		SimpleDateFormat formatter = new SimpleDateFormat(pattern,
-				Locale.getDefault());
+		SimpleDateFormat formatter = new SimpleDateFormat(pattern, Locale.getDefault());
 		String ret = formatter.format(date);
 		return ret;
 	}
@@ -196,14 +196,12 @@ public class DateUtils {
 			startDate = endDate;
 			endDate = swap;
 		}
-		int days = endDate.get(java.util.Calendar.DAY_OF_YEAR)
-				- startDate.get(java.util.Calendar.DAY_OF_YEAR);
+		int days = endDate.get(java.util.Calendar.DAY_OF_YEAR) - startDate.get(java.util.Calendar.DAY_OF_YEAR);
 		int y2 = endDate.get(java.util.Calendar.YEAR);
 		if (startDate.get(java.util.Calendar.YEAR) != y2) {
 			startDate = (java.util.Calendar) startDate.clone();
 			do {
-				days += startDate
-						.getActualMaximum(java.util.Calendar.DAY_OF_YEAR);
+				days += startDate.getActualMaximum(java.util.Calendar.DAY_OF_YEAR);
 				startDate.add(java.util.Calendar.YEAR, 1);
 			} while (startDate.get(java.util.Calendar.YEAR) != y2);
 		}
@@ -233,8 +231,7 @@ public class DateUtils {
 	 * @return
 	 */
 	public static int getHolidays(Calendar startDate, Calendar endDate) {
-		return getDaysBetween(startDate, endDate)
-				- getWorkingDay(startDate, endDate);
+		return getDaysBetween(startDate, endDate) - getWorkingDay(startDate, endDate);
 	}
 
 	/**
@@ -250,6 +247,14 @@ public class DateUtils {
 			result.add(Calendar.DATE, 1);
 		} while (result.get(Calendar.DAY_OF_WEEK) != 2);
 		return result;
+	}
+	
+	public static int getNowYear() {
+		String returnStr = null;
+		SimpleDateFormat f = new SimpleDateFormat("yyyy");
+		Date date = new Date();
+		returnStr = f.format(date);
+		return Integer.parseInt(returnStr);
 	}
 
 	public static int getNowYearMonth() {
@@ -270,6 +275,7 @@ public class DateUtils {
 
 	public static String getNowYearMonthDayHHmmss() {
 		String returnStr = null;
+		System.currentTimeMillis();
 		SimpleDateFormat f = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date date = new Date();
 		returnStr = f.format(date);
@@ -348,10 +354,7 @@ public class DateUtils {
 			charge_end_date = etmp - 1;
 		}
 
-		result = (getDaysBetween(getNextMonday(startDate),
-				getNextMonday(endDate)) / 7)
-				* 5
-				+ charge_start_date
+		result = (getDaysBetween(getNextMonday(startDate), getNextMonday(endDate)) / 7) * 5 + charge_start_date
 				- charge_end_date;
 		return result;
 	}
@@ -372,15 +375,13 @@ public class DateUtils {
 	}
 
 	public static int getYearMonth(Date date) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMM",
-				Locale.getDefault());
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMM", Locale.getDefault());
 		String ret = formatter.format(date);
 		return Integer.parseInt(ret);
 	}
 
 	public static int getYearMonthDay(Date date) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd",
-				Locale.getDefault());
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
 		String ret = formatter.format(date);
 		return Integer.parseInt(ret);
 	}
@@ -451,6 +452,8 @@ public class DateUtils {
 		System.out.println(DateUtils.getDateTime(new Date()));
 		System.out.println(DateUtils.getYearMonthDay(new Date()));
 
+		System.out.println("2014-10-22 00:00:00.0".substring(0, 19));
+
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		int year = calendar.get(Calendar.YEAR);
@@ -473,15 +476,11 @@ public class DateUtils {
 		dateBefore = calendar.getTime();
 		System.out.println(">>>>" + DateUtils.getDate(dateBefore));
 
-		String[] parsePatterns = { DateUtils.DATE_TIME_PATTERN,
-				DateUtils.DATE_PATTERN };
+		String[] parsePatterns = { DateUtils.DATE_TIME_PATTERN, DateUtils.DATE_PATTERN };
 		System.out.println(DateUtils.parseDate("2009-12-25", parsePatterns));
-		System.out.println(DateUtils.parseDate("2009-12-25 12:00:05",
-				parsePatterns));
-		System.out.println(DateUtils.parseDate("2009-12-25 23:59:59",
-				parsePatterns));
-		System.out.println(DateUtils.parseDate("2009-12-25 00:00:00",
-				parsePatterns));
+		System.out.println(DateUtils.parseDate("2009-12-25 12:00:05", parsePatterns));
+		System.out.println(DateUtils.parseDate("2009-12-25 23:59:59", parsePatterns));
+		System.out.println(DateUtils.parseDate("2009-12-25 00:00:00", parsePatterns));
 		System.out.println(Locale.getDefault());
 		System.out.println(DateUtils.toDate("2009"));
 		System.out.println(DateUtils.toDate("2009-12"));
@@ -490,22 +489,24 @@ public class DateUtils {
 		System.out.println(DateUtils.toDate("2009-12-25 10:45"));
 		System.out.println(DateUtils.toDate("2009-12-25 22:45:50"));
 
-		System.out.println(dateDiff(DateUtils.toDate("2013-10-25"),
-				DateUtils.toDate("2013-10-29")));
-		Date toDate = DateUtils
-				.getDateAfter(DateUtils.toDate("2013-03-21"), 60);
+		System.out.println(dateDiff(DateUtils.toDate("2013-10-25"), DateUtils.toDate("2013-10-29")));
+		Date toDate = DateUtils.getDateAfter(DateUtils.toDate("2013-03-21"), 60);
 		System.out.println(getDateTime(toDate));
 		long daysDiff = DateUtils.dateDiff(new Date(), toDate);
 		System.out.println(daysDiff);
 
 		System.out.println(DateUtils.getYearDays(2015));
 
+		System.out.println(DateUtils.toDate("2015-12-25 22:45:50.0"));
+		
+		System.out.println(DateUtils.toDate("1474473600000"));
+		System.out.println(DateUtils.toDate("20160101142323"));
+
 	}
 
 	public static Date parseDate(String str, String[] parsePatterns) {
 		if (str == null || parsePatterns == null) {
-			throw new IllegalArgumentException(
-					"Date and Patterns must not be null");
+			throw new IllegalArgumentException("Date and Patterns must not be null");
 		}
 		SimpleDateFormat parser = null;
 		ParsePosition pos = new ParsePosition(0);
@@ -545,49 +546,78 @@ public class DateUtils {
 		try {
 			if (dateString.length() == 4) {
 				parsePatterns[0] = YEAR_FORMAT;
-				return org.apache.commons.lang3.time.DateUtils.parseDate(
-						dateString, parsePatterns);
+				return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+			} else if (dateString.length() == 6) {
+				parsePatterns[0] = YEAR_MONTH_DAY_FORMAT;
+				return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
 			} else if (dateString.length() == 7) {
 				parsePatterns[0] = MONTH_FORMAT;
-				return org.apache.commons.lang3.time.DateUtils.parseDate(
-						dateString, parsePatterns);
+				return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
 			} else if (dateString.length() == 8) {
 				parsePatterns[0] = YEAR_MONTH_DAY_FORMAT;
-				return org.apache.commons.lang3.time.DateUtils.parseDate(
-						dateString, parsePatterns);
-			}else if (dateString.length() == 10) {
+				return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+			} else if (dateString.length() == 10) {
 				parsePatterns[0] = DAY_FORMAT;
 				try {
-					return org.apache.commons.lang3.time.DateUtils.parseDate(
-							dateString, parsePatterns);
+					return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
 				} catch (Exception ex) {
 					parsePatterns[0] = "MM/dd/yyyy";
-					return org.apache.commons.lang3.time.DateUtils.parseDate(
-							dateString, parsePatterns);
+					return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
 				}
 			} else if (dateString.length() == 13) {
 				parsePatterns[0] = HOUR_FORMAT;
-				return org.apache.commons.lang3.time.DateUtils.parseDate(
-						dateString, parsePatterns);
+				if (StringUtils.isNumeric(dateString)) {
+					try {
+						// 如果是long时间类型
+						long ts = Long.parseLong(dateString);
+						return DateUtils.toDate(ts);
+					} catch (Exception e) {
+						return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+					}
+				} else {
+					return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+				}
+			} else if (dateString.length() == 14) {
+				if (StringUtils.isNumeric(dateString)) {
+					try {
+						return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, FULL_DATE_FORMAT);
+					} catch (Exception e) {
+						return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+					}
+				}
 			} else if (dateString.length() == 16) {
 				parsePatterns[0] = MINUTE_FORMAT;
-				return org.apache.commons.lang3.time.DateUtils.parseDate(
-						dateString, parsePatterns);
+				return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
 			} else if (dateString.length() == 19) {
 				parsePatterns[0] = SECOND_FORMAT;
-				return org.apache.commons.lang3.time.DateUtils.parseDate(
-						dateString, parsePatterns);
+				return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+			} else if (dateString.length() == 21) {
+				parsePatterns[0] = SECOND_FORMAT;
+				dateString = dateString.substring(0, 19);
+				return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
 			} else if (dateString.length() == 24) {
 				parsePatterns[0] = MILSECOND_FORMAT;
-				return org.apache.commons.lang3.time.DateUtils.parseDate(
-						dateString, parsePatterns);
+				Date date = org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+				// 需要增加时区
+				if (dateString.endsWith("Z")) {
+					Calendar ca = Calendar.getInstance();
+					ca.setTime(date);
+					ca.add(Calendar.HOUR_OF_DAY, 8);
+					return ca.getTime();
+				}
+				return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+			} else {
+				if (dateString.length() > 20) {
+					parsePatterns[0] = SECOND_FORMAT;
+					dateString = dateString.substring(0, 19);
+					return org.apache.commons.lang3.time.DateUtils.parseDate(dateString, parsePatterns);
+				}
 			}
 		} catch (ParseException ex) {
-			ex.printStackTrace();
+			
 			throw new RuntimeException(" parse date string error: " + ex);
 		}
-		throw new RuntimeException("Input is not valid date string: "
-				+ dateString);
+		throw new RuntimeException("Input is not valid date string: " + dateString);
 	}
 
 	public static java.sql.Timestamp toTimestamp(java.util.Date date) {

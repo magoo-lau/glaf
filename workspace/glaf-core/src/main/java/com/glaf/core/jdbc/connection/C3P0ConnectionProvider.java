@@ -22,6 +22,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -38,10 +40,11 @@ import com.glaf.core.util.PropertiesHelper;
 
 public class C3P0ConnectionProvider implements ConnectionProvider {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(C3P0ConnectionProvider.class);
+	private static final Logger log = LoggerFactory.getLogger(C3P0ConnectionProvider.class);
 
 	protected static Configuration conf = BaseConfiguration.create();
+
+	protected static int MAX_RETRIES = conf.getInt("jdbc.connection.retryCount", 10);
 
 	private volatile DataSource ds;
 	private volatile Integer isolation;
@@ -66,17 +69,13 @@ public class C3P0ConnectionProvider implements ConnectionProvider {
 	public void configure(Properties props) throws RuntimeException {
 		String jdbcDriverClass = props.getProperty(DBConfiguration.JDBC_DRIVER);
 		String jdbcUrl = props.getProperty(DBConfiguration.JDBC_URL);
-		Properties connectionProps = ConnectionProviderFactory
-				.getConnectionProperties(props);
+		Properties connectionProps = ConnectionProviderFactory.getConnectionProperties(props);
 
-		log.info("C3P0 using driver: " + jdbcDriverClass + " at URL: "
-				+ jdbcUrl);
-		log.info("Connection properties: "
-				+ PropertiesHelper.maskOut(connectionProps, "password"));
+		log.info("C3P0 using driver: " + jdbcDriverClass + " at URL: " + jdbcUrl);
+		log.info("Connection properties: " + PropertiesHelper.maskOut(connectionProps, "password"));
 
 		if (jdbcDriverClass == null) {
-			log.warn("No JDBC Driver class was specified by property "
-					+ DBConfiguration.JDBC_DRIVER);
+			log.warn("No JDBC Driver class was specified by property " + DBConfiguration.JDBC_DRIVER);
 		} else {
 			try {
 				Class.forName(jdbcDriverClass);
@@ -84,8 +83,7 @@ public class C3P0ConnectionProvider implements ConnectionProvider {
 				try {
 					ClassUtils.classForName(jdbcDriverClass);
 				} catch (Exception e) {
-					String msg = "JDBC Driver class not found: "
-							+ jdbcDriverClass;
+					String msg = "JDBC Driver class not found: " + jdbcDriverClass;
 					log.error(msg, e);
 					throw new RuntimeException(msg, e);
 				}
@@ -107,35 +105,27 @@ public class C3P0ConnectionProvider implements ConnectionProvider {
 			Properties allProps = (Properties) props.clone();
 			allProps.putAll(c3props);
 
-			Integer initialPoolSize = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_INITIALSIZE, allProps);
-			Integer minPoolSize = PropertiesHelper.getInteger(
-					ConnectionConstants.PROP_MINACTIVE, allProps);
+			Integer initialPoolSize = PropertiesHelper.getInteger(ConnectionConstants.PROP_INITIALSIZE, allProps);
+			Integer minPoolSize = PropertiesHelper.getInteger(ConnectionConstants.PROP_MINACTIVE, allProps);
 			if (initialPoolSize == null && minPoolSize != null) {
-				c3props.put(ConnectionConstants.PROP_INITIALSIZE, String
-						.valueOf(minPoolSize).trim());
+				c3props.put(ConnectionConstants.PROP_INITIALSIZE, String.valueOf(minPoolSize).trim());
 			}
 
-			DataSource unpooled = DataSources.unpooledDataSource(jdbcUrl,
-					connectionProps);
+			DataSource unpooled = DataSources.unpooledDataSource(jdbcUrl, connectionProps);
 
 			ds = DataSources.pooledDataSource(unpooled, allProps);
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			log.error("could not instantiate C3P0 connection pool", ex);
-			throw new RuntimeException(
-					"Could not instantiate C3P0 connection pool", ex);
+			throw new RuntimeException("Could not instantiate C3P0 connection pool", ex);
 		}
 
 		Connection conn = null;
 		try {
 			conn = ds.getConnection();
 			if (conn == null) {
-				throw new RuntimeException(
-						"C3P0 connection pool can't get jdbc connection");
+				throw new RuntimeException("C3P0 connection pool can't get jdbc connection");
 			}
 		} catch (SQLException ex) {
-			ex.printStackTrace();
 			throw new RuntimeException(ex);
 		} finally {
 			JdbcUtils.close(conn);
@@ -146,48 +136,39 @@ public class C3P0ConnectionProvider implements ConnectionProvider {
 			isolation = null;
 		} else {
 			isolation = new Integer(i);
-			log.info("JDBC isolation level: "
-					+ DBConfiguration.isolationLevelToString(isolation
-							.intValue()));
+			log.info("JDBC isolation level: " + DBConfiguration.isolationLevelToString(isolation.intValue()));
 		}
 
 	}
 
 	public Connection getConnection() throws SQLException {
 		Connection connection = null;
-		int count = 0;
-		while (count < conf.getInt("jdbc.connection.retryCount", 10)) {
+		int retries = 0;
+		while (retries < MAX_RETRIES) {
 			try {
 				connection = ds.getConnection();
 				if (connection != null) {
 					if (isolation != null) {
-						connection
-								.setTransactionIsolation(isolation.intValue());
+						connection.setTransactionIsolation(isolation.intValue());
 					}
 					if (connection.getAutoCommit() != autocommit) {
 						connection.setAutoCommit(autocommit);
 					}
 					return connection;
 				} else {
-					count++;
+					retries++;
 					try {
-						Thread.sleep(conf.getInt("jdbc.connection.retryTimeMs",
-								500));
+						TimeUnit.MILLISECONDS.sleep(200 + new Random().nextInt(1000));// 活锁，随机等待
 					} catch (InterruptedException e) {
-						e.printStackTrace();
 					}
 				}
 			} catch (SQLException ex) {
-				count++;
-				try {
-					Thread.sleep(conf
-							.getInt("jdbc.connection.retryTimeMs", 500));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				if (retries++ == MAX_RETRIES) {
+					throw new SQLException("c3p0 can't getConnection", ex);
 				}
-				if (count >= conf.getInt("jdbc.connection.retryCount", 10)) {
-					ex.printStackTrace();
-					throw ex;
+				try {
+					TimeUnit.MILLISECONDS.sleep(200 + new Random().nextInt(1000));// 活锁，随机等待
+				} catch (InterruptedException e) {
 				}
 			}
 		}

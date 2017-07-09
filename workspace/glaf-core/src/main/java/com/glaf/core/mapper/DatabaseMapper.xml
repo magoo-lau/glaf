@@ -6,25 +6,48 @@
 
 	<resultMap id="databaseResultMap" type="com.glaf.core.domain.Database">
 		<id property="id" column="ID_" jdbcType="BIGINT" />
-		<result property="nodeId" column="NODEID_" jdbcType="BIGINT" />
+		<result property="parentId" column="PARENTID_" jdbcType="BIGINT" />
 		<result property="name" column="NAME_" jdbcType="VARCHAR" />
 		<result property="code" column="CODE_" jdbcType="VARCHAR" />
+		<result property="discriminator" column="DISCRIMINATOR_"
+			jdbcType="VARCHAR" />
+		<result property="mapping" column="MAPPING_" jdbcType="VARCHAR" />
+		<result property="section" column="SECTION_" jdbcType="VARCHAR" />
 		<result property="title" column="TITLE_" jdbcType="VARCHAR" />
 		<result property="host" column="HOST_" jdbcType="VARCHAR" />
 		<result property="port" column="PORT_" jdbcType="INTEGER" />
 		<result property="user" column="USER_" jdbcType="VARCHAR" />
 		<result property="password" column="PASSWORD_" jdbcType="VARCHAR" />
 		<result property="key" column="KEY_" jdbcType="VARCHAR" />
+		<result property="intToken" column="INTTOKEN_" jdbcType="INTEGER" />
+		<result property="token" column="TOKEN_" jdbcType="VARCHAR" />
 		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
+		<result property="runType" column="RUNTYPE_" jdbcType="VARCHAR" />
+		<result property="useType" column="USEYPE_" jdbcType="VARCHAR" />
 		<result property="level" column="LEVEL_" jdbcType="INTEGER" />
 		<result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
 		<result property="operation" column="OPERATION_" jdbcType="INTEGER" />
 		<result property="dbname" column="DBNAME_" jdbcType="VARCHAR" />
+		<result property="bucket" column="BUCKET_" jdbcType="VARCHAR" />
+		<result property="catalog" column="CATALOG_" jdbcType="VARCHAR" />
+		<result property="infoServer" column="INFOSERVER_" jdbcType="VARCHAR" />
+		<result property="loginAs" column="LOGINAS_" jdbcType="VARCHAR" />
+		<result property="loginUrl" column="LOGINURL_" jdbcType="VARCHAR" />
+		<result property="ticket" column="TICKET_" jdbcType="VARCHAR" />
+		<result property="programId" column="PROGRAMID_" jdbcType="VARCHAR" />
+		<result property="programName" column="PROGRAMNAME_" jdbcType="VARCHAR" />
+		<result property="userNameKey" column="USERNAMEKEY_" jdbcType="VARCHAR" />
+		<result property="serverId" column="SERVERID_" jdbcType="BIGINT" />
+		<result property="sysId" column="SYSID_" jdbcType="VARCHAR" />
+		<result property="queueName" column="QUEUENAME_" jdbcType="VARCHAR" />
 		<result property="active" column="ACTIVE_" jdbcType="VARCHAR" />
 		<result property="verify" column="VERIFY_" jdbcType="VARCHAR" />
 		<result property="initFlag" column="INITFLAG_" jdbcType="VARCHAR" />
+		<result property="removeFlag" column="REMOVEFLAG_" jdbcType="VARCHAR" />
 		<result property="providerClass" column="PROVIDERCLASS_"
 			jdbcType="VARCHAR" />
+		<result property="remoteUrl" column="REMOTEURL_" jdbcType="VARCHAR" />
+		<result property="sort" column="SORTNO_" jdbcType="INTEGER" />
 		<result property="createBy" column="CREATEBY_" jdbcType="VARCHAR" />
 		<result property="createTime" column="CREATETIME_" jdbcType="TIMESTAMP" />
 		<result property="updateBy" column="UPDATEBY_" jdbcType="VARCHAR" />
@@ -36,14 +59,23 @@
 		insert into SYS_DATABASE
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			ID_
-			<if test="nodeId != null">
-				,NODEID_
+			<if test="parentId != null">
+				,PARENTID_
 			</if>
 			<if test="name != null">
 				,NAME_
 			</if>
 			<if test="code != null">
 				,CODE_
+			</if>
+			<if test="discriminator != null">
+				,DISCRIMINATOR_
+			</if>
+			<if test="mapping != null">
+				,MAPPING_
+			</if>
+			<if test="section != null">
+				,SECTION_
 			</if>
 			<if test="title != null">
 				,TITLE_
@@ -63,8 +95,20 @@
 			<if test="key != null">
 				,KEY_
 			</if>
+			<if test="intToken != null">
+				,INTTOKEN_
+			</if>
+			<if test="token != null">
+				,TOKEN_
+			</if>
 			<if test="type != null">
 				,TYPE_
+			</if>
+			<if test="runType != null">
+				,RUNTYPE_
+			</if>
+			<if test="useType != null">
+				,USEYPE_
 			</if>
 			<if test="level != null">
 				,LEVEL_
@@ -78,8 +122,47 @@
 			<if test="dbname != null">
 				,DBNAME_
 			</if>
+			<if test="bucket != null">
+				,BUCKET_
+			</if>
+			<if test="catalog != null">
+				,CATALOG_
+			</if>
+			<if test="infoServer != null">
+				,INFOSERVER_
+			</if>
+			<if test="loginAs != null">
+				,LOGINAS_
+			</if>
+			<if test="loginUrl != null">
+				,LOGINURL_
+			</if>
+			<if test="ticket != null">
+				,TICKET_
+			</if>
+			<if test="programId != null">
+				,PROGRAMID_
+			</if>
+			<if test="programName != null">
+				,PROGRAMNAME_
+			</if>
+			<if test="userNameKey != null">
+				,USERNAMEKEY_
+			</if>
+			<if test="serverId != null">
+				,SERVERID_
+			</if>
+			<if test="sysId != null">
+				,SYSID_
+			</if>
+			<if test="queueName != null">
+				,QUEUENAME_
+			</if>
 			<if test="providerClass != null">
 				,PROVIDERCLASS_
+			</if>
+			<if test="remoteUrl != null">
+				,REMOTEURL_
 			</if>
 			<if test="active != null">
 				,ACTIVE_
@@ -89,6 +172,12 @@
 			</if>
 			<if test="initFlag != null">
 				,INITFLAG_
+			</if>
+			<if test="removeFlag != null">
+				,REMOVEFLAG_
+			</if>
+			<if test="sort != null">
+				,SORTNO_
 			</if>
 			<if test="createBy != null">
 				,CREATEBY_
@@ -107,14 +196,23 @@
 		<trim prefix=" values (" suffix=")" suffixOverrides=",">
 			#{id, jdbcType=BIGINT}
 
-			<if test="nodeId != null">
-				,#{nodeId, jdbcType=BIGINT}
+			<if test="parentId != null">
+				,#{parentId, jdbcType=BIGINT}
 			</if>
 			<if test="name != null">
 				,#{name, jdbcType=VARCHAR}
 			</if>
 			<if test="code != null">
 				,#{code, jdbcType=VARCHAR}
+			</if>
+			<if test="discriminator != null">
+				,#{discriminator, jdbcType=VARCHAR}
+			</if>
+			<if test="mapping != null">
+				,#{mapping, jdbcType=VARCHAR}
+			</if>
+			<if test="section != null">
+				,#{section, jdbcType=VARCHAR}
 			</if>
 			<if test="title != null">
 				,#{title, jdbcType=VARCHAR}
@@ -134,8 +232,20 @@
 			<if test="key != null">
 				,#{key, jdbcType=VARCHAR}
 			</if>
+			<if test="intToken != null">
+				,#{intToken, jdbcType=INTEGER}
+			</if>
+			<if test="token != null">
+				,#{token, jdbcType=VARCHAR}
+			</if>
 			<if test="type != null">
 				,#{type, jdbcType=VARCHAR}
+			</if>
+			<if test="runType != null">
+				,#{runType, jdbcType=VARCHAR}
+			</if>
+			<if test="useType != null">
+				,#{useType, jdbcType=VARCHAR}
 			</if>
 			<if test="level != null">
 				,#{level, jdbcType=INTEGER}
@@ -149,8 +259,47 @@
 			<if test="dbname != null">
 				,#{dbname, jdbcType=VARCHAR}
 			</if>
+			<if test="bucket != null">
+				,#{bucket, jdbcType=VARCHAR}
+			</if>
+			<if test="catalog != null">
+				,#{catalog, jdbcType=VARCHAR}
+			</if>
+			<if test="infoServer != null">
+				,#{infoServer, jdbcType=VARCHAR}
+			</if>
+			<if test="loginAs != null">
+				,#{loginAs, jdbcType=VARCHAR}
+			</if>
+			<if test="loginUrl != null">
+				,#{loginUrl, jdbcType=VARCHAR}
+			</if>
+			<if test="ticket != null">
+				,#{ticket, jdbcType=VARCHAR}
+			</if>
+			<if test="programId != null">
+				,#{programId, jdbcType=VARCHAR}
+			</if>
+			<if test="programName != null">
+				,#{programName, jdbcType=VARCHAR}
+			</if>
+			<if test="userNameKey != null">
+				,#{userNameKey, jdbcType=VARCHAR}
+			</if>
+			<if test="serverId != null">
+				,#{serverId, jdbcType=BIGINT}
+			</if>
+			<if test="sysId != null">
+				,#{sysId, jdbcType=VARCHAR}
+			</if>
+			<if test="queueName != null">
+				,#{queueName, jdbcType=VARCHAR}
+			</if>
 			<if test="providerClass != null">
 				,#{providerClass, jdbcType=VARCHAR}
+			</if>
+			<if test="remoteUrl != null">
+				,#{remoteUrl, jdbcType=VARCHAR}
 			</if>
 			<if test="active != null">
 				,#{active, jdbcType=VARCHAR}
@@ -160,6 +309,12 @@
 			</if>
 			<if test="initFlag != null">
 				,#{initFlag, jdbcType=VARCHAR}
+			</if>
+			<if test="removeFlag != null">
+				,#{removeFlag, jdbcType=VARCHAR}
+			</if>
+			<if test="sort != null">
+				,#{sort, jdbcType=INTEGER}
 			</if>
 			<if test="createBy != null">
 				,#{createBy, jdbcType=VARCHAR}
@@ -184,11 +339,14 @@
 			<if test="host != null">
 				HOST_ = #{host, jdbcType=VARCHAR},
 			</if>
-			<if test="name != null">
-				NAME_ = #{name, jdbcType=VARCHAR},
+			<if test="discriminator != null">
+				DISCRIMINATOR_ = #{discriminator, jdbcType=VARCHAR},
 			</if>
-			<if test="code != null">
-				CODE_ = #{code, jdbcType=VARCHAR},
+			<if test="mapping != null">
+				MAPPING_ = #{mapping, jdbcType=VARCHAR},
+			</if>
+			<if test="section != null">
+				SECTION_ = #{section, jdbcType=VARCHAR},
 			</if>
 			<if test="title != null">
 				TITLE_ = #{title, jdbcType=VARCHAR},
@@ -208,6 +366,9 @@
 			<if test="providerClass != null">
 				PROVIDERCLASS_ = #{providerClass, jdbcType=VARCHAR},
 			</if>
+			<if test="remoteUrl != null">
+				REMOTEURL_ = #{remoteUrl, jdbcType=VARCHAR},
+			</if>
 			<if test="level != null">
 				LEVEL_ = #{level, jdbcType=INTEGER},
 			</if>
@@ -220,6 +381,79 @@
 			<if test="dbname != null">
 				DBNAME_ = #{dbname, jdbcType=VARCHAR},
 			</if>
+			<if test="bucket != null">
+				BUCKET_ = #{bucket, jdbcType=VARCHAR},
+			</if>
+			<if test="catalog != null">
+				CATALOG_ = #{catalog, jdbcType=VARCHAR},
+			</if>
+			<if test="infoServer != null">
+				INFOSERVER_ = #{infoServer, jdbcType=VARCHAR},
+			</if>
+			<if test="loginAs != null">
+				LOGINAS_ = #{loginAs, jdbcType=VARCHAR},
+			</if>
+			<if test="loginUrl != null">
+				LOGINURL_ = #{loginUrl, jdbcType=VARCHAR},
+			</if>
+			<if test="ticket != null">
+				TICKET_ = #{ticket, jdbcType=VARCHAR},
+			</if>
+			<if test="programId != null">
+				PROGRAMID_ = #{programId, jdbcType=VARCHAR},
+			</if>
+			<if test="programName != null">
+				PROGRAMNAME_ = #{programName, jdbcType=VARCHAR},
+			</if>
+			<if test="userNameKey != null">
+				USERNAMEKEY_ = #{userNameKey, jdbcType=VARCHAR},
+			</if>
+			<if test="serverId != null">
+				SERVERID_ = #{serverId, jdbcType=BIGINT},
+			</if>
+			<if test="sysId != null">
+				SYSID_ = #{sysId, jdbcType=VARCHAR},
+			</if>
+			<if test="queueName != null">
+				QUEUENAME_ = #{queueName, jdbcType=VARCHAR},
+			</if>
+			<if test="intToken != null">
+				INTTOKEN_ = #{intToken, jdbcType=INTEGER},
+			</if>
+			<if test="token != null">
+				TOKEN_ = #{token, jdbcType=VARCHAR},
+			</if>
+			<if test="active != null">
+				ACTIVE_ = #{active, jdbcType=VARCHAR},
+			</if>
+			<if test="verify != null">
+				VERIFY_ = #{verify, jdbcType=VARCHAR},
+			</if>
+			<if test="initFlag != null">
+				INITFLAG_ = #{initFlag, jdbcType=VARCHAR},
+			</if>
+			<if test="runType != null">
+				RUNTYPE_ = #{runType, jdbcType=VARCHAR},
+			</if>
+			<if test="useType != null">
+				USEYPE_ = #{useType, jdbcType=VARCHAR},
+			</if>
+			<if test="updateBy != null">
+				UPDATEBY_ = #{updateBy, jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATETIME_ = #{updateTime, jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+		where
+		ID_ = #{id, jdbcType=BIGINT}
+
+	</update>
+
+	<update id="verifyDatabase" parameterType="com.glaf.core.domain.Database">
+		update SYS_DATABASE
+		set
+		<trim prefix="" suffix="" suffixOverrides=",">
 			<if test="active != null">
 				ACTIVE_ = #{active, jdbcType=VARCHAR},
 			</if>
@@ -247,23 +481,42 @@
 		SYS_DATABASE
 		where ID_ = #{id}
 	</delete>
-
-
 	<select id="getDatabaseById" parameterType="long" resultMap="databaseResultMap">
 		select * from SYS_DATABASE where ID_ = #{id}
 	</select>
+	<select id="getDatabasesByActorId" parameterType="string"
+		resultMap="databaseResultMap">
 
+		select E.* from SYS_DATABASE E
+		inner join SYS_DATABASE_ACCESS
+		A
+		on E.ID_ =
+		A.DATABASEID_
+		where E.ACTIVE_ = '1'
+		and A.ACTORID_ =
+		#{actorId}
+		order by
+		E.SORTNO_ asc
 
+	</select>
+	
+	
+	<!-- 2016-09-01 根据系统编码获取数据库信息 -->
+    <select id="getDatabaseBySysId" parameterType="string" resultMap="databaseResultMap">
+		select * from SYS_DATABASE where SYSID_ = #{id}
+	</select>
+	
+	
 	<select id="getDatabases" parameterType="com.glaf.core.query.DatabaseQuery"
 		resultMap="databaseResultMap">
-		select distinct E.*
+		select *
 		<include refid="selectDatabasesSql" />
 		<choose>
 			<when test="orderBy != null">
 				order by ${orderBy}
 			</when>
 			<otherwise>
-				order by E.TITLE_ asc
+				order by E.SORTNO_ asc
 			</otherwise>
 		</choose>
 	</select>
@@ -291,15 +544,15 @@
 				</foreach>
 			</if>
 
-			<if test="nodeId != null">
-				and E.NODEID_ = #{nodeId}
+			<if test="parentId != null">
+				and E.PARENTID_ = #{parentId}
 			</if>
 
-			<if test="nodeIds != null and nodeIds.size() &gt; 0">
-				and E.NODEID_ IN
-				<foreach item="x_nodeId" index="index" collection="nodeIds"
+			<if test="parentIds != null and parentIds.size() &gt; 0">
+				and E.PARENTID_ IN
+				<foreach item="x_parentId" index="index" collection="parentIds"
 					open="(" separator="," close=")">
-					#{x_nodeId}
+					#{x_parentId}
 				</foreach>
 			</if>
 
@@ -315,24 +568,66 @@
 				and E.HOST_ like #{hostLike}
 			</if>
 
+			<if test="titleLike != null and titleLike != '' ">
+				and E.TITLE_ like #{titleLike}
+			</if>
+
+			<if test="keywordsLike != null and keywordsLike != '' ">
+				and ( E.TITLE_ like #{keywordsLike}
+				or E.HOST_ like
+				#{keywordsLike}
+				or E.MAPPING_ like #{keywordsLike}
+				or E.SECTION_ like
+				#{keywordsLike}
+				)
+			</if>
+
 			<if test="type != null and type != '' ">
 				and E.TYPE_ = #{type}
 			</if>
 
-			<if test="types != null and types.size() &gt; 0">
-				and E.TYPE_ IN
-				<foreach item="x_type" index="index" collection="types"
-					open="(" separator="," close=")">
-					#{x_type}
-				</foreach>
+			<if test="runType != null and runType != '' ">
+				and E.RUNTYPE_ = #{runType}
+			</if>
+
+			<if test="runTypeLike != null and runTypeLike != '' ">
+				and E.RUNTYPE_ like #{runTypeLike}
 			</if>
 
 			<if test="active != null and active != '' ">
 				and E.ACTIVE_ = #{active}
 			</if>
 
+			<if test="useType != null and useType != '' ">
+				and E.USEYPE_ = #{useType}
+			</if>
+
 			<if test="initFlag != null and initFlag != '' ">
 				and E.INITFLAG_ = #{initFlag}
+			</if>
+
+			<if test="removeFlag != null and removeFlag != '' ">
+				and E.REMOVEFLAG_ = #{removeFlag}
+			</if>
+
+			<if test="ticket != null and ticket != '' ">
+				and E.TICKET_ = #{ticket}
+			</if>
+
+			<if test="programId != null and programId != '' ">
+				and E.PROGRAMID_ = #{programId}
+			</if>
+
+			<if test="programName != null and programName != '' ">
+				and E.PROGRAMNAME_ = #{programName}
+			</if>
+
+			<if test="userNameKey != null and userNameKey != '' ">
+				and E.USERNAMEKEY_ = #{userNameKey}
+			</if>
+
+			<if test="serverId != null">
+				and E.SERVERID_ = #{serverId}
 			</if>
 
 			<if test="createBy != null and createBy != '' ">

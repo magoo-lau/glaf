@@ -61,10 +61,8 @@ import com.glaf.core.base.ConnectionDefinition;
 import com.glaf.core.cache.ClearCacheJob;
 import com.glaf.core.config.*;
 import com.glaf.core.context.ContextFactory;
-import com.glaf.core.db.DbTableChecker;
 import com.glaf.core.resource.ResourceFactory;
 import com.glaf.core.service.EntityService;
-import com.glaf.core.service.ITableDefinitionService;
 import com.glaf.core.startup.BootstrapManager;
 import com.glaf.core.util.ThreadContextHolder;
 import com.glaf.core.util.Tools;
@@ -1013,20 +1011,7 @@ public class BaseDataManager {
 		 * 
 		 */
 		if (conf.getBoolean("load.table.meta", false)) {
-			logger.debug("load table meta...");
-			ITableDefinitionService tableDefinitionService = null;
-			try {
-				tableDefinitionService = ContextFactory
-						.getBean("tableDefinitionService");
-				if (tableDefinitionService != null) {
-					DbTableChecker checker = new DbTableChecker();
-					checker.setTableDefinitionService(tableDefinitionService);
-					checker.checkTables();
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-			logger.debug("load table meta finish.");
+			 
 		}
 	}
 

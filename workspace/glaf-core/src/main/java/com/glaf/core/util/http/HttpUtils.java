@@ -59,13 +59,12 @@ public class HttpUtils {
 	 * URLEncoder.encode().
 	 */
 	private static final Pattern ENCODED_CHARACTERS_PATTERN;
+
 	static {
 		StringBuilder pattern = new StringBuilder();
 
-		pattern.append(Pattern.quote("+")).append("|")
-				.append(Pattern.quote("*")).append("|")
-				.append(Pattern.quote("%7E")).append("|")
-				.append(Pattern.quote("%2F"));
+		pattern.append(Pattern.quote("+")).append("|").append(Pattern.quote("*")).append("|")
+				.append(Pattern.quote("%7E")).append("|").append(Pattern.quote("%2F"));
 
 		ENCODED_CHARACTERS_PATTERN = Pattern.compile(pattern.toString());
 	}
@@ -93,8 +92,7 @@ public class HttpUtils {
 	 *            Whether double-slash in the path should be escaped to "/%2F"
 	 * @return The baseUri with the (encoded) path appended
 	 */
-	public static String appendUri(final String baseUri, String path,
-			final boolean escapeDoubleSlash) {
+	public static String appendUri(final String baseUri, String path, final boolean escapeDoubleSlash) {
 		String resultUri = baseUri;
 		if (path != null && path.length() > 0) {
 			if (path.startsWith("/")) {
@@ -118,6 +116,38 @@ public class HttpUtils {
 		return resultUri;
 	}
 
+	public static String doGet(String requestUrl) {
+		AsyncHttpClient client = null;
+		try {
+			client = HttpConnectionFactory.getHttpClient();
+			Future<Response> future = client.prepareGet(requestUrl).execute();
+			Response response = (Response) future.get();
+			return response.getResponseBody();
+		} catch (Exception ex) {
+			
+			log.error("http request error:{}", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			//HttpConnectionFactory.close();
+		}
+	}
+
+	public static String doPost(String requestUrl) {
+		AsyncHttpClient client = null;
+		try {
+			client = HttpConnectionFactory.getHttpClient();
+			Future<Response> future = client.preparePost(requestUrl).execute();
+			Response response = (Response) future.get();
+			return response.getResponseBody();
+		} catch (Exception ex) {
+			
+			log.error("http request error:{}", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			//HttpConnectionFactory.close();
+		}
+	}
+
 	/**
 	 * 发起https请求并获取结果
 	 * 
@@ -129,22 +159,20 @@ public class HttpUtils {
 	 *            提交的数据
 	 * @return
 	 */
-	public static String doRequest(String requestUrl, String method,
-			String content, boolean isSSL) {
+	public static String doRequest(String requestUrl, String method, String content, boolean isSSL) {
 		log.debug("requestUrl:" + requestUrl);
 		HttpsURLConnection conn = null;
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 		InputStreamReader inputStreamReader = null;
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		try {
 			URL url = new URL(requestUrl);
 			conn = (HttpsURLConnection) url.openConnection();
 			if (isSSL) {
 				// 创建SSLContext对象，并使用我们指定的信任管理器初始化
 				TrustManager[] tm = { new MyX509TrustManager() };
-				SSLContext sslContext = SSLContext
-						.getInstance("SSL", "SunJSSE");
+				SSLContext sslContext = SSLContext.getInstance("SSL", "SunJSSE");
 				sslContext.init(null, tm, new java.security.SecureRandom());
 				// 从上述SSLContext对象中得到SSLSocketFactory对象
 				SSLSocketFactory ssf = sslContext.getSocketFactory();
@@ -184,7 +212,7 @@ public class HttpUtils {
 			ce.printStackTrace();
 			log.error(" http server connection timed out.");
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			
 			log.error("http request error:{}", ex);
 		} finally {
 			IOUtils.closeQuietly(inputStream);
@@ -208,8 +236,7 @@ public class HttpUtils {
 	 *            提交的数据
 	 * @return
 	 */
-	public static byte[] download(String requestUrl, String requestMethod,
-			String outputStr, boolean isSSL) {
+	public static byte[] download(String requestUrl, String requestMethod, String outputStr, boolean isSSL) {
 		byte[] buff = null;
 		AsyncHttpClient client = null;
 		InputStream inputStream = null;
@@ -224,8 +251,7 @@ public class HttpUtils {
 				future = client.prepareGet(requestUrl).execute();
 			} else {
 				if (StringUtils.isNotEmpty(outputStr)) {
-					future = client.preparePost(requestUrl)
-							.setBody(outputStr.getBytes("UTF-8")).execute();
+					future = client.preparePost(requestUrl).setBody(outputStr.getBytes("UTF-8")).execute();
 				} else {
 					future = client.preparePost(requestUrl).execute();
 				}
@@ -237,7 +263,7 @@ public class HttpUtils {
 			// 释放资源
 			IOUtils.closeQuietly(inputStream);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			
 			log.error("http request error:{}", ex);
 		} finally {
 			IOUtils.closeQuietly(inputStream);
@@ -256,8 +282,7 @@ public class HttpUtils {
 	 *            提交的数据
 	 * @return JSONObject(通过JSONObject.get(key)的方式获取json对象的属性值)
 	 */
-	public static JSONObject executeRequest(String requestUrl,
-			String requestMethod, String outputStr) {
+	public static JSONObject executeRequest(String requestUrl, String requestMethod, String outputStr) {
 		String content = process(requestUrl, requestMethod, outputStr, true);
 		JSONObject jsonObject = JSON.parseObject(content);
 		return jsonObject;
@@ -298,9 +323,8 @@ public class HttpUtils {
 	 *            提交的数据
 	 * @return
 	 */
-	public static String process(String requestUrl, String requestMethod,
-			String outputStr, boolean isSSL) {
-		StringBuffer buffer = new StringBuffer();
+	public static String process(String requestUrl, String requestMethod, String outputStr, boolean isSSL) {
+		StringBuilder buffer = new StringBuilder();
 		AsyncHttpClient client = null;
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
@@ -317,8 +341,7 @@ public class HttpUtils {
 				future = client.prepareGet(requestUrl).execute();
 			} else {
 				if (StringUtils.isNotEmpty(outputStr)) {
-					future = client.preparePost(requestUrl)
-							.setBody(outputStr.getBytes("UTF-8")).execute();
+					future = client.preparePost(requestUrl).setBody(outputStr.getBytes("UTF-8")).execute();
 				} else {
 					future = client.preparePost(requestUrl).execute();
 				}
@@ -338,7 +361,7 @@ public class HttpUtils {
 			IOUtils.closeQuietly(inputStream);
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			
 			log.error("http request error:{}", ex);
 		} finally {
 			IOUtils.closeQuietly(bufferedReader);

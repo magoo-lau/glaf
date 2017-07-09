@@ -15,21 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.glaf.core.jdbc;
 
-package com.glaf.core.parse;
+import com.glaf.core.base.ConnectionDefinition;
+import com.glaf.core.config.DatabaseConnectionConfig;
 
-import java.util.List;
+public class CheckDBConnectionThread implements Runnable {
 
-import com.glaf.core.base.TableModel;
+	private ConnectionDefinition connectionDefinition;
 
-public interface Parser {
+	public CheckDBConnectionThread(ConnectionDefinition connectionDefinition) {
+		this.connectionDefinition = connectionDefinition;
+	}
 
-	/**
-	 * 将数据流解析为数据模型
-	 * @param tableModel 定义模型对象
-	 * @param data 数据流
-	 * @return
-	 */
-	List<TableModel> parse(TableModel tableModel, java.io.InputStream data);
+	public void run() {
+		DatabaseConnectionConfig config = new DatabaseConnectionConfig();
+		boolean verify = config.checkConnection(connectionDefinition);
+		config.resetVerify(connectionDefinition.getName(), verify);
+	}
 
 }

@@ -44,11 +44,11 @@ public class TableDefinitionJsonFactory {
 
 	public static TableDefinition jsonToObject(JSONObject jsonObject) {
 		TableDefinition model = new TableDefinition();
+		if (jsonObject.containsKey("tableId")) {
+			model.setTableId(jsonObject.getString("tableId"));
+		}
 		if (jsonObject.containsKey("tableName")) {
 			model.setTableName(jsonObject.getString("tableName"));
-		}
-		if (jsonObject.containsKey("parentTableName")) {
-			model.setParentTableName(jsonObject.getString("parentTableName"));
 		}
 		if (jsonObject.containsKey("nodeId")) {
 			model.setNodeId(jsonObject.getLong("nodeId"));
@@ -83,18 +83,29 @@ public class TableDefinitionJsonFactory {
 		if (jsonObject.containsKey("topId")) {
 			model.setTopId(jsonObject.getString("topId"));
 		}
-		if (jsonObject.containsKey("aggregationKeys")) {
-			model.setAggregationKeys(jsonObject.getString("aggregationKeys"));
+		if (jsonObject.containsKey("aggregationKey")) {
+			model.setAggregationKey(jsonObject.getString("aggregationKey"));
 		}
 		if (jsonObject.containsKey("primaryKey")) {
 			model.setPrimaryKey(jsonObject.getString("primaryKey"));
 		}
-		if (jsonObject.containsKey("queryIds")) {
-			model.setQueryIds(jsonObject.getString("queryIds"));
+		if (jsonObject.containsKey("attachmentFlag")) {
+			model.setAttachmentFlag(jsonObject.getString("attachmentFlag"));
 		}
-		if (jsonObject.containsKey("aggregationQueryIds")) {
-			model.setAggregationQueryIds(jsonObject
-					.getString("aggregationQueryIds"));
+		if (jsonObject.containsKey("attachmentExts")) {
+			model.setAttachmentExts(jsonObject.getString("attachmentExts"));
+		}
+		if (jsonObject.containsKey("attachmentSize")) {
+			model.setAttachmentSize(jsonObject.getInteger("attachmentSize"));
+		}
+		if (jsonObject.containsKey("auditFlag")) {
+			model.setAuditFlag(jsonObject.getString("auditFlag"));
+		}
+		if (jsonObject.containsKey("privilegeFlag")) {
+			model.setPrivilegeFlag(jsonObject.getString("privilegeFlag"));
+		}
+		if (jsonObject.containsKey("treeFlag")) {
+			model.setTreeFlag(jsonObject.getString("treeFlag"));
 		}
 		if (jsonObject.containsKey("temporaryFlag")) {
 			model.setTemporaryFlag(jsonObject.getString("temporaryFlag"));
@@ -141,8 +152,7 @@ public class TableDefinitionJsonFactory {
 
 		if (jsonObject.containsKey("columns")) {
 			JSONArray array = jsonObject.getJSONArray("columns");
-			List<ColumnDefinition> columns = ColumnDefinitionJsonFactory
-					.arrayToList(array);
+			List<ColumnDefinition> columns = ColumnDefinitionJsonFactory.arrayToList(array);
 			model.setColumns(columns);
 		}
 
@@ -162,16 +172,11 @@ public class TableDefinitionJsonFactory {
 
 	public static JSONObject toJsonObject(TableDefinition model) {
 		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("tableId", model.getTableId());
 		jsonObject.put("tableName", model.getTableName());
 		jsonObject.put("_tableName_", model.getTableName());
-		jsonObject.put("tableName_enc",
-				RequestUtils.encodeString(model.getTableName()));
+		jsonObject.put("tableName_enc", RequestUtils.encodeString(model.getTableName()));
 
-		if (model.getParentTableName() != null) {
-			jsonObject.put("parentTableName", model.getParentTableName());
-			jsonObject.put("parentTableName_enc",
-					RequestUtils.encodeString(model.getParentTableName()));
-		}
 		if (model.getNodeId() != null) {
 			jsonObject.put("nodeId", model.getNodeId());
 		}
@@ -201,18 +206,27 @@ public class TableDefinitionJsonFactory {
 		if (model.getTopId() != null) {
 			jsonObject.put("topId", model.getTopId());
 		}
-		if (model.getAggregationKeys() != null) {
-			jsonObject.put("aggregationKeys", model.getAggregationKeys());
+		if (model.getAggregationKey() != null) {
+			jsonObject.put("aggregationKey", model.getAggregationKey());
 		}
 		if (model.getPrimaryKey() != null) {
 			jsonObject.put("primaryKey", model.getPrimaryKey());
 		}
-		if (model.getQueryIds() != null) {
-			jsonObject.put("queryIds", model.getQueryIds());
+		if (model.getAttachmentFlag() != null) {
+			jsonObject.put("attachmentFlag", model.getAttachmentFlag());
 		}
-		if (model.getAggregationQueryIds() != null) {
-			jsonObject.put("aggregationQueryIds",
-					model.getAggregationQueryIds());
+		if (model.getAttachmentExts() != null) {
+			jsonObject.put("attachmentExts", model.getAttachmentExts());
+		}
+		jsonObject.put("attachmentSize", model.getAttachmentSize());
+		if (model.getAuditFlag() != null) {
+			jsonObject.put("auditFlag", model.getAuditFlag());
+		}
+		if (model.getPrivilegeFlag() != null) {
+			jsonObject.put("privilegeFlag", model.getPrivilegeFlag());
+		}
+		if (model.getTreeFlag() != null) {
+			jsonObject.put("treeFlag", model.getTreeFlag());
 		}
 		if (model.getTemporaryFlag() != null) {
 			jsonObject.put("temporaryFlag", model.getTemporaryFlag());
@@ -221,12 +235,9 @@ public class TableDefinitionJsonFactory {
 			jsonObject.put("deleteFetch", model.getDeleteFetch());
 		}
 		if (model.getCreateTime() != null) {
-			jsonObject.put("createTime",
-					DateUtils.getDate(model.getCreateTime()));
-			jsonObject.put("createTime_date",
-					DateUtils.getDate(model.getCreateTime()));
-			jsonObject.put("createTime_datetime",
-					DateUtils.getDateTime(model.getCreateTime()));
+			jsonObject.put("createTime", DateUtils.getDate(model.getCreateTime()));
+			jsonObject.put("createTime_date", DateUtils.getDate(model.getCreateTime()));
+			jsonObject.put("createTime_datetime", DateUtils.getDateTime(model.getCreateTime()));
 		}
 		if (model.getCreateBy() != null) {
 			jsonObject.put("createBy", model.getCreateBy());
@@ -245,6 +256,7 @@ public class TableDefinitionJsonFactory {
 		jsonObject.put("deleteCascade", model.getDeleteCascade());
 		jsonObject.put("locked", model.getLocked());
 		jsonObject.put("deleteFlag", model.getDeleteFlag());
+		jsonObject.put("sortNo", model.getSortNo());
 		if (model.getSystemFlag() != null) {
 			jsonObject.put("systemFlag", model.getSystemFlag());
 		}
@@ -264,15 +276,10 @@ public class TableDefinitionJsonFactory {
 
 	public static ObjectNode toObjectNode(TableDefinition model) {
 		ObjectNode jsonObject = new ObjectMapper().createObjectNode();
+		jsonObject.put("tableId", model.getTableId());
 		jsonObject.put("tableName", model.getTableName());
-		jsonObject.put("tableName_enc",
-				RequestUtils.encodeString(model.getTableName()));
+		jsonObject.put("tableName_enc", RequestUtils.encodeString(model.getTableName()));
 
-		if (model.getParentTableName() != null) {
-			jsonObject.put("parentTableName", model.getParentTableName());
-			jsonObject.put("parentTableName_enc",
-					RequestUtils.encodeString(model.getParentTableName()));
-		}
 		if (model.getNodeId() != null) {
 			jsonObject.put("nodeId", model.getNodeId());
 		}
@@ -302,18 +309,29 @@ public class TableDefinitionJsonFactory {
 		if (model.getTopId() != null) {
 			jsonObject.put("topId", model.getTopId());
 		}
-		if (model.getAggregationKeys() != null) {
-			jsonObject.put("aggregationKeys", model.getAggregationKeys());
+		if (model.getAggregationKey() != null) {
+			jsonObject.put("aggregationKey", model.getAggregationKey());
 		}
 		if (model.getPrimaryKey() != null) {
 			jsonObject.put("primaryKey", model.getPrimaryKey());
 		}
-		if (model.getQueryIds() != null) {
-			jsonObject.put("queryIds", model.getQueryIds());
+		if (model.getAttachmentFlag() != null) {
+			jsonObject.put("attachmentFlag", model.getAttachmentFlag());
 		}
-		if (model.getAggregationQueryIds() != null) {
-			jsonObject.put("aggregationQueryIds",
-					model.getAggregationQueryIds());
+		if (model.getAttachmentExts() != null) {
+			jsonObject.put("attachmentExts", model.getAttachmentExts());
+		}
+		jsonObject.put("attachmentSize", model.getAttachmentSize());
+
+		if (model.getAuditFlag() != null) {
+			jsonObject.put("auditFlag", model.getAuditFlag());
+		}
+
+		if (model.getPrivilegeFlag() != null) {
+			jsonObject.put("privilegeFlag", model.getPrivilegeFlag());
+		}
+		if (model.getTreeFlag() != null) {
+			jsonObject.put("treeFlag", model.getTreeFlag());
 		}
 		if (model.getTemporaryFlag() != null) {
 			jsonObject.put("temporaryFlag", model.getTemporaryFlag());
@@ -322,12 +340,9 @@ public class TableDefinitionJsonFactory {
 			jsonObject.put("deleteFetch", model.getDeleteFetch());
 		}
 		if (model.getCreateTime() != null) {
-			jsonObject.put("createTime",
-					DateUtils.getDate(model.getCreateTime()));
-			jsonObject.put("createTime_date",
-					DateUtils.getDate(model.getCreateTime()));
-			jsonObject.put("createTime_datetime",
-					DateUtils.getDateTime(model.getCreateTime()));
+			jsonObject.put("createTime", DateUtils.getDate(model.getCreateTime()));
+			jsonObject.put("createTime_date", DateUtils.getDate(model.getCreateTime()));
+			jsonObject.put("createTime_datetime", DateUtils.getDateTime(model.getCreateTime()));
 		}
 		if (model.getCreateBy() != null) {
 			jsonObject.put("createBy", model.getCreateBy());

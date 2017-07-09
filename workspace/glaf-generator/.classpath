@@ -49,5 +49,6 @@
 	<classpathentry kind="lib" path="/glaf-core/lib/javassist.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/junit.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/freemarker.jar"/>
+	<classpathentry kind="lib" path="/glaf-core/lib/fastjson.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

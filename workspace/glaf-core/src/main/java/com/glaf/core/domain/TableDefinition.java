@@ -23,231 +23,193 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.glaf.core.base.ClassDefinition;
-import com.glaf.core.base.FieldDefinition;
+
 import com.glaf.core.domain.util.ColumnDefinitionJsonFactory;
 import com.glaf.core.domain.util.TableDefinitionJsonFactory;
 
 /**
  * 数据表定义
  * 
- * @author joy
  * 
  */
-@Entity
-@Table(name = "SYS_TABLE")
-public class TableDefinition implements java.io.Serializable,
-		java.lang.Comparable<TableDefinition>, ClassDefinition {
 
+public class TableDefinition implements java.io.Serializable, java.lang.Comparable<TableDefinition> {
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "ADDTYPE_")
+	protected String tableId;
+
+	/**
+	 * 表名
+	 */
+	protected String tableName;
+
 	protected int addType;
+
+	protected String dbType;
 
 	/**
 	 * 聚合主键列集
 	 */
-	@Column(name = "AGGREGATIONKEYS_", length = 500)
-	protected String aggregationKeys;
+	protected String aggregationKey;
 
-	@Column(name = "CLASSNAME_", length = 250)
 	protected String className;
 
-	@Column(name = "COLUMNQTY_")
 	protected int columnQty;
 
-	@Transient
 	protected List<ColumnDefinition> columns = new java.util.ArrayList<ColumnDefinition>();
 
 	/**
 	 * 创建人
 	 */
-	@Column(name = "CREATEBY_", length = 50)
 	protected String createBy;
 
 	/**
 	 * 创建时间
 	 */
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "CREATETIME_")
 	protected Date createTime;
 
 	/**
 	 * 级联删除
 	 */
-	@Column(name = "DELETECASCADE_")
 	protected int deleteCascade;
 
 	/**
 	 * 是否删除抓取数据
 	 */
-	@Column(name = "DELETEFETCH_", length = 1)
 	protected String deleteFetch;
 
-	@Column(name = "DELETEFLAG_")
 	protected int deleteFlag;
 
 	/**
 	 * 描述
 	 */
-	@Column(name = "DESCRIPTION_", length = 500)
 	protected String description;
 
 	/**
 	 * 显示类型 form,grid,tree,treegrid
 	 */
-	@Column(name = "DISPLAYTYPE_", length = 50)
 	protected String displayType;
 
 	/**
 	 * 标题
 	 */
-	@Column(name = "ENGLISHTITLE_")
 	protected String englishTitle;
 
-	@Column(name = "ENTITYNAME_", length = 50)
 	protected String entityName;
 
-	@Transient
 	protected ColumnDefinition idColumn;
+
+	protected List<ColumnDefinition> idColumns;
 
 	/**
 	 * 级联插入
 	 */
-	@Column(name = "INSERTCASCADE_")
 	protected int insertCascade;
 
-	@Transient
 	protected boolean insertOnly;
 
-	@Column(name = "ISSUBTABLE_", length = 2)
+	protected boolean updateAllowed = true;
+
+	/**
+	 * 是否从表(Y-从表，N-不是从表)
+	 */
 	protected String isSubTable;
 
 	/**
 	 * 是否需要JBPM工作流支持
 	 */
-	@Transient
 	protected boolean jbpmSupport;
 
 	/**
 	 * 是否锁定
 	 */
-	@Column(name = "LOCKED_")
 	protected int locked;
 
 	/**
 	 * 模块名称
 	 */
-	@javax.persistence.Transient
 	protected String moduleName;
 
-	@Column(name = "PACKAGENAME_", length = 200)
 	protected String packageName;
 
-	@Column(name = "PARENTTABLENAME_", length = 50)
-	protected String parentTableName;
-
-	@Column(name = "PRIMARYKEY_", length = 200)
 	protected String primaryKey;
-
-	@Transient
-	protected List<QueryDefinition> queries = new java.util.ArrayList<QueryDefinition>();
-
-	@Transient
-	protected List<QueryDefinition> aggregationQueries = new java.util.ArrayList<QueryDefinition>();
-
-	/**
-	 * 组合查询的查询编号
-	 */
-	@Column(name = "QUERYIDS_", length = 500)
-	protected String queryIds;
-
-	/**
-	 * 聚合查询的查询编号
-	 */
-	@Column(name = "AGGR_QUERYIDS_", length = 500)
-	protected String aggregationQueryIds;
 
 	/**
 	 * 修订版本
 	 */
-	@Column(name = "REVISION_")
 	protected int revision;
 
-	@Column(name = "SORTNO_")
 	private int sortNo;
 
-	@Column(name = "SYSNUM_", length = 100)
 	protected String sysnum;
 
-	@Column(name = "SYSTEMFLAG_", length = 2)
 	protected String systemFlag;
 
-	/**
-	 * 表名
-	 */
-	@Id
-	@Column(name = "TABLENAME_", length = 50)
-	protected String tableName;
-
-	@javax.persistence.Transient
 	protected String name;
+
+	/**
+	 * 附件标识 0-无，1-1个附件，2-多个附件
+	 */
+	protected String attachmentFlag;
+
+	/**
+	 * 附件允许的扩展名
+	 */
+	protected String attachmentExts;
+
+	/**
+	 * 附件大小
+	 */
+	protected int attachmentSize;
+
+	/**
+	 * 审核标记
+	 */
+	protected String auditFlag;
+
+	/**
+	 * 树型结构标识， Y-树型，N-非树型
+	 */
+	protected String treeFlag;
+
+	/**
+	 * 权限标识
+	 */
+	protected String privilegeFlag;
 
 	/**
 	 * 是否临时表
 	 */
-	@Column(name = "TEMPORARYFLAG_", length = 1)
 	protected String temporaryFlag;
 
 	/**
 	 * 标题
 	 */
-	@Column(name = "TITLE_")
 	protected String title;
 
-	@Column(name = "TOPID_", length = 50)
 	protected String topId;
 
 	/**
 	 * 是否树型结构
 	 */
-	@Transient
 	protected boolean treeSupport;
 
 	/**
 	 * 表类型
 	 */
-	@Column(name = "TYPE_", length = 50)
 	protected String type;
 
 	/**
 	 * 级联更新
 	 */
-	@Column(name = "UPDATECASCADE_")
 	protected int updateCascade;
 
-	@Column(name = "NODEID_")
 	protected Long nodeId;
 
 	public TableDefinition() {
 
-	}
-
-	public void addAggregationQuery(QueryDefinition query) {
-		if (aggregationQueries == null) {
-			aggregationQueries = new java.util.ArrayList<QueryDefinition>();
-		}
-		aggregationQueries.add(query);
 	}
 
 	public void addColumn(ColumnDefinition column) {
@@ -259,21 +221,22 @@ public class TableDefinition implements java.io.Serializable,
 		}
 	}
 
-	public void addField(FieldDefinition field) {
+	public void addField(ColumnDefinition field) {
 		if (columns == null) {
 			columns = new java.util.ArrayList<ColumnDefinition>();
 		}
 		JSONObject jsonObject = field.toJsonObject();
-		ColumnDefinition column = ColumnDefinitionJsonFactory
-				.jsonToObject(jsonObject);
+		ColumnDefinition column = ColumnDefinitionJsonFactory.jsonToObject(jsonObject);
 		columns.add(column);
 	}
 
-	public void addQuery(QueryDefinition query) {
-		if (queries == null) {
-			queries = new java.util.ArrayList<QueryDefinition>();
+	public void addIdColumn(ColumnDefinition column) {
+		if (idColumns == null) {
+			idColumns = new java.util.ArrayList<ColumnDefinition>();
 		}
-		queries.add(query);
+		if (!idColumns.contains(column)) {
+			idColumns.add(column);
+		}
 	}
 
 	public int compareTo(TableDefinition o) {
@@ -316,16 +279,24 @@ public class TableDefinition implements java.io.Serializable,
 		return addType;
 	}
 
-	public String getAggregationKeys() {
-		return aggregationKeys;
+	public String getAggregationKey() {
+		return aggregationKey;
 	}
 
-	public List<QueryDefinition> getAggregationQueries() {
-		return aggregationQueries;
+	public String getAttachmentExts() {
+		return attachmentExts;
 	}
 
-	public String getAggregationQueryIds() {
-		return aggregationQueryIds;
+	public String getAttachmentFlag() {
+		return attachmentFlag;
+	}
+
+	public int getAttachmentSize() {
+		return attachmentSize;
+	}
+
+	public String getAuditFlag() {
+		return auditFlag;
 	}
 
 	public String getClassName() {
@@ -352,6 +323,10 @@ public class TableDefinition implements java.io.Serializable,
 
 	public Date getCreateTime() {
 		return createTime;
+	}
+
+	public String getDbType() {
+		return dbType;
 	}
 
 	public int getDeleteCascade() {
@@ -382,8 +357,8 @@ public class TableDefinition implements java.io.Serializable,
 		return entityName;
 	}
 
-	public Map<String, FieldDefinition> getFields() {
-		Map<String, FieldDefinition> fieldMap = new LinkedHashMap<String, FieldDefinition>();
+	public Map<String, ColumnDefinition> getFields() {
+		Map<String, ColumnDefinition> fieldMap = new LinkedHashMap<String, ColumnDefinition>();
 		if (columns != null && !columns.isEmpty()) {
 			for (ColumnDefinition column : columns) {
 				fieldMap.put(column.getName(), column);
@@ -396,7 +371,11 @@ public class TableDefinition implements java.io.Serializable,
 		return idColumn;
 	}
 
-	public FieldDefinition getIdField() {
+	public List<ColumnDefinition> getIdColumns() {
+		return idColumns;
+	}
+
+	public ColumnDefinition getIdField() {
 		return idColumn;
 	}
 
@@ -431,20 +410,12 @@ public class TableDefinition implements java.io.Serializable,
 		return packageName;
 	}
 
-	public String getParentTableName() {
-		return parentTableName;
-	}
-
 	public String getPrimaryKey() {
 		return primaryKey;
 	}
 
-	public List<QueryDefinition> getQueries() {
-		return queries;
-	}
-
-	public String getQueryIds() {
-		return queryIds;
+	public String getPrivilegeFlag() {
+		return privilegeFlag;
 	}
 
 	public int getRevision() {
@@ -463,6 +434,10 @@ public class TableDefinition implements java.io.Serializable,
 		return systemFlag;
 	}
 
+	public String getTableId() {
+		return tableId;
+	}
+
 	public String getTableName() {
 		return tableName;
 	}
@@ -479,6 +454,10 @@ public class TableDefinition implements java.io.Serializable,
 		return topId;
 	}
 
+	public String getTreeFlag() {
+		return treeFlag;
+	}
+
 	public String getType() {
 		return type;
 	}
@@ -491,8 +470,7 @@ public class TableDefinition implements java.io.Serializable,
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((tableName == null) ? 0 : tableName.hashCode());
+		result = prime * result + ((tableName == null) ? 0 : tableName.hashCode());
 		return result;
 	}
 
@@ -508,6 +486,10 @@ public class TableDefinition implements java.io.Serializable,
 		return treeSupport;
 	}
 
+	public boolean isUpdateAllowed() {
+		return updateAllowed;
+	}
+
 	public TableDefinition jsonToObject(JSONObject jsonObject) {
 		return TableDefinitionJsonFactory.jsonToObject(jsonObject);
 	}
@@ -516,16 +498,24 @@ public class TableDefinition implements java.io.Serializable,
 		this.addType = addType;
 	}
 
-	public void setAggregationKeys(String aggregationKeys) {
-		this.aggregationKeys = aggregationKeys;
+	public void setAggregationKey(String aggregationKey) {
+		this.aggregationKey = aggregationKey;
 	}
 
-	public void setAggregationQueries(List<QueryDefinition> aggregationQueries) {
-		this.aggregationQueries = aggregationQueries;
+	public void setAttachmentExts(String attachmentExts) {
+		this.attachmentExts = attachmentExts;
 	}
 
-	public void setAggregationQueryIds(String aggregationQueryIds) {
-		this.aggregationQueryIds = aggregationQueryIds;
+	public void setAttachmentFlag(String attachmentFlag) {
+		this.attachmentFlag = attachmentFlag;
+	}
+
+	public void setAttachmentSize(int attachmentSize) {
+		this.attachmentSize = attachmentSize;
+	}
+
+	public void setAuditFlag(String auditFlag) {
+		this.auditFlag = auditFlag;
 	}
 
 	public void setClassName(String className) {
@@ -546,6 +536,10 @@ public class TableDefinition implements java.io.Serializable,
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public void setDbType(String dbType) {
+		this.dbType = dbType;
 	}
 
 	public void setDeleteCascade(int deleteCascade) {
@@ -584,7 +578,11 @@ public class TableDefinition implements java.io.Serializable,
 		}
 	}
 
-	public void setIdField(FieldDefinition idField) {
+	public void setIdColumns(List<ColumnDefinition> idColumns) {
+		this.idColumns = idColumns;
+	}
+
+	public void setIdField(ColumnDefinition idField) {
 		JSONObject jsonObject = idField.toJsonObject();
 		this.idColumn = ColumnDefinitionJsonFactory.jsonToObject(jsonObject);
 		idColumn.setPrimaryKey(true);
@@ -626,20 +624,12 @@ public class TableDefinition implements java.io.Serializable,
 		this.packageName = packageName;
 	}
 
-	public void setParentTableName(String parentTableName) {
-		this.parentTableName = parentTableName;
-	}
-
 	public void setPrimaryKey(String primaryKey) {
 		this.primaryKey = primaryKey;
 	}
 
-	public void setQueries(List<QueryDefinition> queries) {
-		this.queries = queries;
-	}
-
-	public void setQueryIds(String queryIds) {
-		this.queryIds = queryIds;
+	public void setPrivilegeFlag(String privilegeFlag) {
+		this.privilegeFlag = privilegeFlag;
 	}
 
 	public void setRevision(int revision) {
@@ -658,6 +648,10 @@ public class TableDefinition implements java.io.Serializable,
 		this.systemFlag = systemFlag;
 	}
 
+	public void setTableId(String tableId) {
+		this.tableId = tableId;
+	}
+
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
@@ -674,12 +668,20 @@ public class TableDefinition implements java.io.Serializable,
 		this.topId = topId;
 	}
 
+	public void setTreeFlag(String treeFlag) {
+		this.treeFlag = treeFlag;
+	}
+
 	public void setTreeSupport(boolean treeSupport) {
 		this.treeSupport = treeSupport;
 	}
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public void setUpdateAllowed(boolean updateAllowed) {
+		this.updateAllowed = updateAllowed;
 	}
 
 	public void setUpdateCascade(int updateCascade) {

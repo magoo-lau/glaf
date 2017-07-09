@@ -23,9 +23,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.netty.util.concurrent.FastThreadLocal;
+
 public class ConnectionThreadHolder {
 
-	private static ThreadLocal<List<Connection>> connectionThreadLocalHolder = new ThreadLocal<List<Connection>>();
+	private static FastThreadLocal<List<Connection>> connectionThreadLocalHolder = new FastThreadLocal<List<Connection>>();
 
 	public static void addConnection(Connection connection) {
 		List<Connection> connections = connectionThreadLocalHolder.get();
@@ -47,7 +49,7 @@ public class ConnectionThreadHolder {
 								connection.close();
 							}
 						} catch (SQLException ex) {
-							ex.printStackTrace();
+							
 						}
 					}
 				}

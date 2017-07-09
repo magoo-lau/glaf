@@ -23,7 +23,7 @@ import java.util.*;
 import org.springframework.stereotype.Component;
 
 import com.glaf.core.base.TableModel;
-import com.glaf.core.domain.SysExtension;
+ 
 
 @Component
 public interface TableDataMapper {
@@ -34,8 +34,6 @@ public interface TableDataMapper {
 
 	List<Map<String, Object>> getTableDataByConditions(TableModel query);
 
-	List<SysExtension> getExtensionDataByConditions(TableModel query);
-
 	Map<String, Object> getTableDataByPrimaryKey(TableModel query);
 
 	List<Map<String, Object>> getTableKeyMap(TableModel query);
@@ -44,6 +42,10 @@ public interface TableDataMapper {
 
 	void insertTableData(TableModel model);
 
+	void insertHBaseTableData(TableModel model);
+
 	void updateTableDataByPrimaryKey(TableModel model);
+
+	void updateTableData(TableModel model);
 
 }

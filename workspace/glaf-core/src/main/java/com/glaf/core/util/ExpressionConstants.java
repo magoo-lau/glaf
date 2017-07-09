@@ -20,11 +20,17 @@ package com.glaf.core.util;
 
 public class ExpressionConstants {
 
+	public static final String CURRENT_YYYY_EXPRESSION = "#{curr_yyyy}";
+
 	public static final String CURRENT_YYYYMM_EXPRESSION = "#{curr_yyyymm}";
 
 	public static final String CURRENT_YYYYMMDD_EXPRESSION = "#{curr_yyyymmdd}";
 
+	public static final String CURRENT_TIMEMILLIS_EXPRESSION = "#{curr_timemillis}";
+
 	public static final String ID_EXPRESSION = "#{id}";
+	
+	public static final String ID_PREFIX_EXPRESSION = "#{id:";
 
 	public static final String INPUT_YYYYMM_EXPRESSION = "#{input_yyyymm}";
 

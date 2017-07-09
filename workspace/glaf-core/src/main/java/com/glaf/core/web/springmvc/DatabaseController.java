@@ -71,7 +71,7 @@ public class DatabaseController {
 				.getLong(request, "id"));
 		if (repository != null) {
 			request.setAttribute("database", repository);
-			request.setAttribute("nodeId", repository.getNodeId());
+			//request.setAttribute("nodeId", repository.getNodeId());
 		} else {
 			request.setAttribute("nodeId",
 					RequestUtils.getLong(request, "nodeId"));
@@ -393,7 +393,7 @@ public class DatabaseController {
 		database.setPassword(password);
 		database.setTitle(request.getParameter("title"));
 		database.setCode(request.getParameter("code"));
-		database.setNodeId(RequestUtils.getLong(request, "nodeId"));
+		//database.setNodeId(RequestUtils.getLong(request, "nodeId"));
 		database.setHost(request.getParameter("host"));
 		database.setPort(RequestUtils.getInt(request, "port"));
 		database.setName(request.getParameter("name"));
@@ -448,7 +448,7 @@ public class DatabaseController {
 
 			database.setUser(user);
 			database.setTitle(request.getParameter("title"));
-			database.setNodeId(RequestUtils.getLong(request, "nodeId"));
+			//database.setNodeId(RequestUtils.getLong(request, "nodeId"));
 			database.setHost(request.getParameter("host"));
 			database.setPort(RequestUtils.getInt(request, "port"));
 			database.setType(request.getParameter("type"));

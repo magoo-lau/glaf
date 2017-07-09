@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.glaf.generator.tools;
 
 import java.io.*;
@@ -52,8 +70,7 @@ public class Pdm2SqlMap {
 			Iterator<?> iterator = tableList.iterator();
 			while (iterator.hasNext()) {
 				Document d = DocumentHelper.createDocument();
-				d.addDocType("sqlMap",
-						"-//ibatis.apache.org//DTD SQL Map 2.0//EN",
+				d.addDocType("sqlMap", "-//ibatis.apache.org//DTD SQL Map 2.0//EN",
 						"http://ibatis.apache.org/dtd/sql-map-2.dtd");
 
 				EntityResolver resolver = new ClassPathEntityResolver();
@@ -76,12 +93,10 @@ public class Pdm2SqlMap {
 				String alias = name;
 				String className = name;
 				if (name.indexOf('.') != -1) {
-					alias = name.substring(name.lastIndexOf('.') + 1,
-							name.length());
+					alias = name.substring(name.lastIndexOf('.') + 1, name.length());
 					className = alias;
 					char ch = alias.charAt(0);
-					alias = String.valueOf(ch).toLowerCase()
-							+ alias.substring(1, alias.length());
+					alias = String.valueOf(ch).toLowerCase() + alias.substring(1, alias.length());
 				}
 
 				/**
@@ -116,21 +131,16 @@ public class Pdm2SqlMap {
 				Element primaryKey = element.element("PrimaryKey");
 				if (primaryKey != null) {
 					if (primaryKey.element("Key") != null) {
-						String ref = primaryKey.element("Key").attributeValue(
-								"Ref");
+						String ref = primaryKey.element("Key").attributeValue("Ref");
 						if (element.element("Keys") != null) {
-							List<?> keys = element.element("Keys").elements(
-									"Key");
+							List<?> keys = element.element("Keys").elements("Key");
 							Iterator<?> iiii = keys.iterator();
 							while (iiii.hasNext()) {
 								Element e = (Element) iiii.next();
 								if (ref.equals(e.attributeValue("Id"))) {
 									if (e.element("Key.Columns") != null
-											&& e.element("Key.Columns")
-													.element("Column") != null) {
-										String id = e.element("Key.Columns")
-												.element("Column")
-												.attributeValue("Ref");
+											&& e.element("Key.Columns").element("Column") != null) {
+										String id = e.element("Key.Columns").element("Column").attributeValue("Ref");
 
 										pk_property = idMap.get(id);
 										pk_column = pk_property;
@@ -171,14 +181,12 @@ public class Pdm2SqlMap {
 				insert.addAttribute("id", "insert" + className);
 				insert.addAttribute("parameterClass", alias);
 
-				StringBuffer buffer = new StringBuffer();
-				buffer.append(newline).append("\t\t INSERT INTO ")
-						.append(table);
+				StringBuilder buffer = new StringBuilder();
+				buffer.append(newline).append("\t\t INSERT INTO ").append(table);
 				buffer.append(" ( ").append(pk_column).append(", ");
 
-				StringBuffer sb = new StringBuffer();
-				sb.append(newline).append("\t\t VALUES ( #")
-						.append(pk_property).append("#, ");
+				StringBuilder sb = new StringBuilder();
+				sb.append(newline).append("\t\t VALUES ( #").append(pk_property).append("#, ");
 
 				Iterator<String> i = colMap.keySet().iterator();
 				while (i.hasNext()) {
@@ -204,13 +212,11 @@ public class Pdm2SqlMap {
 				dynamicInsert.addAttribute("parameterClass", alias);
 
 				buffer.delete(0, buffer.length());
-				buffer.append(newline).append("\t\t INSERT INTO ")
-						.append(table);
+				buffer.append(newline).append("\t\t INSERT INTO ").append(table);
 				buffer.append(" ( ").append(pk_column).append(' ');
 
 				sb.delete(0, sb.length());
-				sb.append(newline).append("\t\t VALUES ( #")
-						.append(pk_property).append("#, ");
+				sb.append(newline).append("\t\t VALUES ( #").append(pk_property).append("#, ");
 
 				dynamicInsert.addText(buffer.toString());
 
@@ -221,15 +227,13 @@ public class Pdm2SqlMap {
 				while (i.hasNext()) {
 					String col = i.next();
 					String p = colMap.get(col);
-					Element isPropertyAvailable = dynamicx
-							.addElement("isPropertyAvailable");
+					Element isPropertyAvailable = dynamicx.addElement("isPropertyAvailable");
 					isPropertyAvailable.addAttribute("prepend", ",");
 					isPropertyAvailable.addAttribute("property", p);
 					isPropertyAvailable.setText(col);
 				}
 
-				dynamicInsert.addText(newline + "\t\t ) VALUES ( #"
-						+ pk_property + "# ");
+				dynamicInsert.addText(newline + "\t\t ) VALUES ( #" + pk_property + "# ");
 
 				Element dynamicy = dynamicInsert.addElement("dynamic");
 				dynamicy.addAttribute("prepend", "");
@@ -238,8 +242,7 @@ public class Pdm2SqlMap {
 				while (i.hasNext()) {
 					String col = i.next();
 					String p = colMap.get(col);
-					Element isPropertyAvailable = dynamicy
-							.addElement("isPropertyAvailable");
+					Element isPropertyAvailable = dynamicy.addElement("isPropertyAvailable");
 					isPropertyAvailable.addAttribute("prepend", ",");
 					isPropertyAvailable.addAttribute("property", p);
 					isPropertyAvailable.setText("#" + p + "#");
@@ -262,15 +265,13 @@ public class Pdm2SqlMap {
 				while (i.hasNext()) {
 					String col = i.next();
 					String p = colMap.get(col);
-					Element isPropertyAvailable = dynamic
-							.addElement("isPropertyAvailable");
+					Element isPropertyAvailable = dynamic.addElement("isPropertyAvailable");
 					isPropertyAvailable.addAttribute("prepend", ",");
 					isPropertyAvailable.addAttribute("property", p);
 					isPropertyAvailable.addText(col + " = #" + p + "#");
 				}
 
-				update.addText(newline + "\t\t WHERE " + pk_column + " = #"
-						+ pk_property + "# ");
+				update.addText(newline + "\t\t WHERE " + pk_column + " = #" + pk_property + "# ");
 
 				/**
 				 * 根据主键删除数据
@@ -286,8 +287,8 @@ public class Pdm2SqlMap {
 				} else {
 					delete.addAttribute("parameterClass", "java.lang.String");
 				}
-				delete.addText(newline + "\t\t DELETE FROM " + table
-						+ " WHERE " + pk_column + " = #" + pk_property + "# ");
+				delete.addText(
+						newline + "\t\t DELETE FROM " + table + " WHERE " + pk_column + " = #" + pk_property + "# ");
 
 				/**
 				 * 查询统计数据
@@ -354,19 +355,16 @@ public class Pdm2SqlMap {
 					}
 
 					if (op.trim().length() > 0) {
-						Element isPropertyAvailable = dynamic55
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic55.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "AND");
 						isPropertyAvailable.addAttribute("property", p);
 
-						Element isNotNull55 = isPropertyAvailable
-								.addElement(op);
+						Element isNotNull55 = isPropertyAvailable.addElement(op);
 						isNotNull55.addAttribute("prepend", "");
 						isNotNull55.addAttribute("property", p);
 						isNotNull55.addText(expr);
 					} else {
-						Element isPropertyAvailable = dynamic55
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic55.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "AND");
 						isPropertyAvailable.addAttribute("property", p);
 						isPropertyAvailable.addText(expr);
@@ -387,8 +385,7 @@ public class Pdm2SqlMap {
 				iterate55.addAttribute("open", "(");
 				iterate55.addAttribute("close", ")");
 				iterate55.addAttribute("conjunction", "OR");
-				iterate55.addText(" ( " + pk_column + " = #" + pk_property
-						+ "s[]# ) ");
+				iterate55.addText(" ( " + pk_column + " = #" + pk_property + "s[]# ) ");
 
 				/**
 				 * 查询数据
@@ -455,8 +452,7 @@ public class Pdm2SqlMap {
 					}
 
 					if (op.trim().length() > 0) {
-						Element isPropertyAvailable = dynamic5
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic5.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "AND");
 						isPropertyAvailable.addAttribute("property", p);
 
@@ -465,8 +461,7 @@ public class Pdm2SqlMap {
 						isNotNull.addAttribute("property", p);
 						isNotNull.addText(expr);
 					} else {
-						Element isPropertyAvailable = dynamic5
-								.addElement("isPropertyAvailable");
+						Element isPropertyAvailable = dynamic5.addElement("isPropertyAvailable");
 						isPropertyAvailable.addAttribute("prepend", "AND");
 						isPropertyAvailable.addAttribute("property", p);
 						isPropertyAvailable.addText(expr);
@@ -487,8 +482,7 @@ public class Pdm2SqlMap {
 				iterate.addAttribute("open", "(");
 				iterate.addAttribute("close", ")");
 				iterate.addAttribute("conjunction", "OR");
-				iterate.addText(" ( " + pk_column + " = #" + pk_property
-						+ "s[]# ) ");
+				iterate.addText(" ( " + pk_column + " = #" + pk_property + "s[]# ) ");
 
 				String filename = table + "_sqlmap.xml";
 
@@ -512,9 +506,11 @@ public class Pdm2SqlMap {
 		} else {
 			if (file.isDirectory()) {
 				String[] filelist = file.list(); // 列出所有的子文件（夹）名字
-				for (int i = 0; i < filelist.length; i++) {
-					File f = new File(file.getPath() + "/" + filelist[i]);
-					this.convert(f);
+				if (filelist != null) {
+					for (int i = 0; i < filelist.length; i++) {
+						File f = new File(file.getPath() + "/" + filelist[i]);
+						this.convert(f);
+					}
 				}
 			}
 		}

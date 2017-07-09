@@ -19,9 +19,7 @@
 package com.glaf.core.security;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -45,7 +43,6 @@ import javax.crypto.Cipher;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -62,14 +59,10 @@ import com.glaf.core.util.UUID32;
  * 
  */
 public final class RSAUtils {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(RSAUtils.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RSAUtils.class);
 
 	/** 算法名称 */
 	private static final String ALGORITHOM = "RSA";
-
-	/** 保存生成的密钥对的文件名称。 */
-	private static final String RSA_PAIR_FILENAME = "/RSAKey";
 
 	/** 密钥大小 */
 	private static final int KEY_SIZE = 1024;
@@ -77,24 +70,20 @@ public final class RSAUtils {
 	/** 默认的安全服务提供者 */
 	private static final Provider DEFAULT_PROVIDER = new BouncyCastleProvider();
 
-	private static KeyPairGenerator keyPairGen = null;
+	private static volatile KeyPairGenerator keyPairGen = null;
 
-	private static KeyFactory keyFactory = null;
+	private static volatile KeyFactory keyFactory = null;
 
 	/** 缓存的密钥对。 */
-	private static KeyPair oneKeyPair = null;
-
-	private static File rsaPairFile = null;
+	private static volatile KeyPair oneKeyPair = null;
 
 	static {
 		try {
-			keyPairGen = KeyPairGenerator.getInstance(ALGORITHOM,
-					DEFAULT_PROVIDER);
+			keyPairGen = KeyPairGenerator.getInstance(ALGORITHOM, DEFAULT_PROVIDER);
 			keyFactory = KeyFactory.getInstance(ALGORITHOM, DEFAULT_PROVIDER);
 		} catch (NoSuchAlgorithmException ex) {
 			LOGGER.error(ex.getMessage());
 		}
-		rsaPairFile = new File(getRSAPairFilePath());
 	}
 
 	private RSAUtils() {
@@ -110,8 +99,7 @@ public final class RSAUtils {
 	 *            要解密的数据。
 	 * @return 原数据。
 	 */
-	public static byte[] decrypt(PrivateKey privateKey, byte[] data)
-			throws Exception {
+	public static byte[] decrypt(PrivateKey privateKey, byte[] data) throws Exception {
 		Cipher ci = Cipher.getInstance(ALGORITHOM, DEFAULT_PROVIDER);
 		ci.init(Cipher.DECRYPT_MODE, privateKey);
 		return ci.doFinal(data);
@@ -138,8 +126,7 @@ public final class RSAUtils {
 			byte[] data = decrypt(privateKey, en_data);
 			return new String(data);
 		} catch (Exception ex) {
-			LOGGER.error(String.format("\"%s\" Decryption failed. Cause: %s",
-					encrypttext, ex.getCause().getMessage()));
+			LOGGER.error(String.format("\"%s\" Decryption failed. Cause: %s", encrypttext, ex.getCause().getMessage()));
 		}
 		return null;
 	}
@@ -164,8 +151,7 @@ public final class RSAUtils {
 			byte[] data = decrypt((RSAPrivateKey) keyPair.getPrivate(), en_data);
 			return new String(data);
 		} catch (Exception ex) {
-			LOGGER.error(String.format("\"%s\" Decryption failed. Cause: %s",
-					encrypttext, ex.getMessage()));
+			LOGGER.error(String.format("\"%s\" Decryption failed. Cause: %s", encrypttext, ex.getMessage()));
 		}
 		return null;
 	}
@@ -194,8 +180,7 @@ public final class RSAUtils {
 	 *            要加密的数据。
 	 * @return 加密后的数据。
 	 */
-	public static byte[] encrypt(PublicKey publicKey, byte[] data)
-			throws Exception {
+	public static byte[] encrypt(PublicKey publicKey, byte[] data) throws Exception {
 		Cipher ci = Cipher.getInstance(ALGORITHOM, DEFAULT_PROVIDER);
 		ci.init(Cipher.ENCRYPT_MODE, publicKey);
 		return ci.doFinal(data);
@@ -256,18 +241,14 @@ public final class RSAUtils {
 	 */
 	private static synchronized KeyPair generateKeyPair() {
 		try {
-			keyPairGen.initialize(KEY_SIZE, new SecureRandom(UUID32.getUUID()
-					.getBytes()));
+			keyPairGen.initialize(KEY_SIZE, new SecureRandom(UUID32.getUUID().getBytes()));
 			oneKeyPair = keyPairGen.generateKeyPair();
 			saveKeyPair(oneKeyPair);
 			return oneKeyPair;
 		} catch (InvalidParameterException ex) {
-			LOGGER.error("KeyPairGenerator does not support a key length of "
-					+ KEY_SIZE + ".", ex);
+			LOGGER.error("KeyPairGenerator does not support a key length of " + KEY_SIZE + ".", ex);
 		} catch (Exception ex) {
-			LOGGER.error(
-					"RSAUtils#KEY_PAIR_GEN is null, can not generate KeyPairGenerator instance.",
-					ex);
+			LOGGER.error("RSAUtils#KEY_PAIR_GEN is null, can not generate KeyPairGenerator instance.", ex);
 		}
 		return null;
 	}
@@ -281,18 +262,15 @@ public final class RSAUtils {
 	 *            专用指数。
 	 * @return RSA专用私钥对象。
 	 */
-	public static RSAPrivateKey generateRSAPrivateKey(byte[] modulus,
-			byte[] privateExponent) {
-		RSAPrivateKeySpec privateKeySpec = new RSAPrivateKeySpec(
-				new BigInteger(modulus), new BigInteger(privateExponent));
+	public static RSAPrivateKey generateRSAPrivateKey(byte[] modulus, byte[] privateExponent) {
+		RSAPrivateKeySpec privateKeySpec = new RSAPrivateKeySpec(new BigInteger(modulus),
+				new BigInteger(privateExponent));
 		try {
 			return (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
 		} catch (InvalidKeySpecException ex) {
 			LOGGER.error("RSAPrivateKeySpec is unavailable.", ex);
 		} catch (Exception ex) {
-			LOGGER.error(
-					"RSAUtils#KEY_FACTORY is null, can not generate KeyFactory instance.",
-					ex);
+			LOGGER.error("RSAUtils#KEY_FACTORY is null, can not generate KeyFactory instance.", ex);
 		}
 		return null;
 	}
@@ -306,18 +284,14 @@ public final class RSAUtils {
 	 *            专用指数。
 	 * @return RSA专用公钥对象。
 	 */
-	public static RSAPublicKey generateRSAPublicKey(byte[] modulus,
-			byte[] publicExponent) {
-		RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(new BigInteger(
-				modulus), new BigInteger(publicExponent));
+	public static RSAPublicKey generateRSAPublicKey(byte[] modulus, byte[] publicExponent) {
+		RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(new BigInteger(modulus), new BigInteger(publicExponent));
 		try {
 			return (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
 		} catch (InvalidKeySpecException ex) {
 			LOGGER.error("RSAPublicKeySpec is unavailable.", ex);
 		} catch (Exception ex) {
-			LOGGER.error(
-					"RSAUtils#KEY_FACTORY is null, can not generate KeyFactory instance.",
-					ex);
+			LOGGER.error("RSAUtils#KEY_FACTORY is null, can not generate KeyFactory instance.", ex);
 		}
 		return null;
 	}
@@ -344,8 +318,11 @@ public final class RSAUtils {
 	 * 返回RSA密钥对。
 	 */
 	public static KeyPair getKeyPair() {
+		if (oneKeyPair != null) {
+			return oneKeyPair;
+		}
 		// 首先判断是否需要重新生成新的密钥对文件
-		if (isCreateKeyPairFile()) {
+		if (isCreateKeyPair()) {
 			// 直接强制生成密钥对文件，并存入缓存。
 			return generateKeyPair();
 		}
@@ -353,14 +330,6 @@ public final class RSAUtils {
 			return oneKeyPair;
 		}
 		return readKeyPair();
-	}
-
-	/**
-	 * 返回生成/读取的密钥对文件的路径。
-	 */
-	private static String getRSAPairFilePath() {
-		String urlPath = RSAUtils.class.getResource("/").getPath();
-		return (new File(urlPath).getParent() + RSA_PAIR_FILENAME);
 	}
 
 	/**
@@ -372,12 +341,11 @@ public final class RSAUtils {
 	 *            专用指数。
 	 * @return RSA专用私钥对象。
 	 */
-	public static RSAPrivateKey getRSAPrivateKey(String hexModulus,
-			String hexPrivateExponent) {
-		if (StringUtils.isEmpty(hexModulus)
-				|| StringUtils.isEmpty(hexPrivateExponent)) {
+	public static RSAPrivateKey getRSAPrivateKey(String hexModulus, String hexPrivateExponent) {
+		if (StringUtils.isEmpty(hexModulus) || StringUtils.isEmpty(hexPrivateExponent)) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("hexModulus and hexPrivateExponent cannot be empty. RSAPrivateKey value is null to return.");
+				LOGGER.debug(
+						"hexModulus and hexPrivateExponent cannot be empty. RSAPrivateKey value is null to return.");
 			}
 			return null;
 		}
@@ -404,10 +372,8 @@ public final class RSAUtils {
 	 *            专用指数。
 	 * @return RSA专用公钥对象。
 	 */
-	public static RSAPublicKey getRSAPublidKey(String hexModulus,
-			String hexPublicExponent) {
-		if (StringUtils.isEmpty(hexModulus)
-				|| StringUtils.isEmpty(hexPublicExponent)) {
+	public static RSAPublicKey getRSAPublidKey(String hexModulus, String hexPublicExponent) {
+		if (StringUtils.isEmpty(hexModulus) || StringUtils.isEmpty(hexPublicExponent)) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("hexModulus and hexPublicExponent cannot be empty. return null(RSAPublicKey).");
 			}
@@ -430,12 +396,14 @@ public final class RSAUtils {
 	/**
 	 * 若需要创建新的密钥对文件，则返回 {@code true}，否则 {@code false}。
 	 */
-	private static boolean isCreateKeyPairFile() {
+	private static boolean isCreateKeyPair() {
+		if (oneKeyPair != null) {
+			return false;
+		}
 		InputStream in = null;
 		ObjectInputStream ois = null;
 		try {
-			SysKeyService sysKeyService = ContextFactory
-					.getBean("sysKeyService");
+			SysKeyService sysKeyService = ContextFactory.getBean("sysKeyService");
 			SysKey sysKey = sysKeyService.getSysKey("RSAKey");
 			if (sysKey != null && sysKey.getData() != null) {
 				in = new ByteArrayInputStream(sysKey.getData());
@@ -445,25 +413,19 @@ public final class RSAUtils {
 				return false;
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			throw new RuntimeException(ex);
 		} finally {
 			IOUtils.closeQuietly(ois);
 			IOUtils.closeQuietly(in);
 		}
-		// 是否创建新的密钥对文件
-		boolean createNewKeyPair = false;
-		if (!rsaPairFile.exists() || rsaPairFile.isDirectory()) {
-			createNewKeyPair = true;
-		}
-		return createNewKeyPair;
+		return true;
 	}
 
 	private static KeyPair readKeyPair() {
 		InputStream in = null;
 		ObjectInputStream ois = null;
 		try {
-			SysKeyService sysKeyService = ContextFactory
-					.getBean("sysKeyService");
+			SysKeyService sysKeyService = ContextFactory.getBean("sysKeyService");
 			SysKey sysKey = sysKeyService.getSysKey("RSAKey");
 			if (sysKey != null && sysKey.getData() != null) {
 				in = new ByteArrayInputStream(sysKey.getData());
@@ -472,18 +434,7 @@ public final class RSAUtils {
 				return oneKeyPair;
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(ois);
-			IOUtils.closeQuietly(in);
-		}
-		try {
-			in = FileUtils.openInputStream(rsaPairFile);
-			ois = new ObjectInputStream(in);
-			oneKeyPair = (KeyPair) ois.readObject();
-			return oneKeyPair;
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			throw new RuntimeException(ex);
 		} finally {
 			IOUtils.closeQuietly(ois);
 			IOUtils.closeQuietly(in);
@@ -498,48 +449,46 @@ public final class RSAUtils {
 	 *            要保存的密钥对。
 	 */
 	private static void saveKeyPair(KeyPair keyPair) {
-		FileOutputStream fos = null;
+		byte[] bytes = null;
+		ByteArrayOutputStream baos = null;
 		ObjectOutputStream oos = null;
 		try {
-			fos = FileUtils.openOutputStream(rsaPairFile);
-			oos = new ObjectOutputStream(fos);
+			baos = new ByteArrayOutputStream();
+			oos = new ObjectOutputStream(baos);
 			oos.writeObject(keyPair);
+			oos.flush();
+			baos.flush();
+			bytes = baos.toByteArray();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			throw new RuntimeException(ex);
 		} finally {
 			IOUtils.closeQuietly(oos);
-			IOUtils.closeQuietly(fos);
+			IOUtils.closeQuietly(baos);
 		}
-		FileInputStream fin = null;
 		try {
-			fin = FileUtils.openInputStream(rsaPairFile);
 			SysKey sysKey = new SysKey();
 			sysKey.setId("RSAKey");
 			sysKey.setCreateBy("system");
 			sysKey.setName("RSAKey");
 			sysKey.setType("RSA");
 			sysKey.setTitle("系统默认的RSA密锁");
-			sysKey.setPath(rsaPairFile.getName());
-			sysKey.setData(IOUtils.toByteArray(fin));
-			SysKeyService sysKeyService = ContextFactory
-					.getBean("sysKeyService");
+			sysKey.setData(bytes);
+			SysKeyService sysKeyService = ContextFactory.getBean("sysKeyService");
 			sysKeyService.save(sysKey);
 		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(fin);
+			throw new RuntimeException(ex);
 		}
 	}
 
 	public static void main(String[] args) {
 		RSAPublicKey publicKey = RSAUtils.getDefaultPublicKey();
-		System.out.println(new String(Hex.encodeHex(publicKey.getModulus()
-				.toByteArray())));
-		System.out.println(new String(Hex.encodeHex(publicKey
-				.getPublicExponent().toByteArray())));
-		System.out
-				.println(RSAUtils
-						.decryptStringByJs("2d7754804ecfb3c3e6fb7d12cdf439036f1d8e2ad34c5a6467bd6f1c165bb47f0fa57134b013aba49be5edf5231c2f7b611af5e974b521ea715b1a6bad6cfbf4ba8e0886c5fe1ce903d30ae0c8cd5f422860d67fa4fd3e2a8fc7872c6b052a6c8f480cfde5e147d959f3db5032767c393ff271742f66be7657290a5de218e375"));
+		System.out.println(new String(Hex.encodeHex(publicKey.getModulus().toByteArray())));
+		System.out.println(new String(Hex.encodeHex(publicKey.getPublicExponent().toByteArray())));
+		System.out.println(RSAUtils.decryptStringByJs(
+				"2d7754804ecfb3c3e6fb7d12cdf439036f1d8e2ad34c5a6467bd6f1c165bb47f0fa57134b013aba49be5edf5231c2f7b611af5e974b521ea715b1a6bad6cfbf4ba8e0886c5fe1ce903d30ae0c8cd5f422860d67fa4fd3e2a8fc7872c6b052a6c8f480cfde5e147d959f3db5032767c393ff271742f66be7657290a5de218e375"));
+		String str = RSAUtils.encryptString("glaf基础开发框架");
+		System.out.println("加密后：" + str);
+		System.out.println("解密后：" + RSAUtils.decryptString(str));
 	}
 
 }

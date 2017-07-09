@@ -26,16 +26,23 @@ public class DatabaseQuery extends DataQuery {
 	private static final long serialVersionUID = 1L;
 	protected List<Long> databaseIds;
 	protected Collection<String> appActorIds;
-	protected Long nodeId;
-	protected List<Long> nodeIds;
 	protected String titleLike;
 	protected String code;
 	protected String host;
 	protected String hostLike;
 	protected String type;
-	protected List<String> types;
+	protected String runType;
+	protected String runTypeLike;
+	protected String keywordsLike;
+	protected String ticket;
+	protected String programId;
+	protected String programName;
+	protected String userNameKey;
+	protected Long serverId;
+	protected String useType;
 	protected String active;
 	protected String initFlag;
+	protected String removeFlag;
 	protected Date createTimeGreaterThanOrEqual;
 	protected Date createTimeLessThanOrEqual;
 
@@ -103,12 +110,16 @@ public class DatabaseQuery extends DataQuery {
 		return initFlag;
 	}
 
-	public Long getNodeId() {
-		return nodeId;
-	}
-
-	public List<Long> getNodeIds() {
-		return nodeIds;
+	public String getKeywordsLike() {
+		if (keywordsLike != null && keywordsLike.trim().length() > 0) {
+			if (!keywordsLike.startsWith("%")) {
+				keywordsLike = "%" + keywordsLike;
+			}
+			if (!keywordsLike.endsWith("%")) {
+				keywordsLike = keywordsLike + "%";
+			}
+		}
+		return keywordsLike;
 	}
 
 	public String getOrderBy() {
@@ -118,8 +129,8 @@ public class DatabaseQuery extends DataQuery {
 				a_x = sortOrder;
 			}
 
-			if ("nodeId".equals(sortColumn)) {
-				orderBy = "E.NODEID_" + a_x;
+			if ("parentId".equals(sortColumn)) {
+				orderBy = "E.PARENTID_" + a_x;
 			}
 
 			if ("host".equals(sortColumn)) {
@@ -158,10 +169,46 @@ public class DatabaseQuery extends DataQuery {
 		return orderBy;
 	}
 
+	public String getProgramId() {
+		return programId;
+	}
+
+	public String getProgramName() {
+		return programName;
+	}
+
+	public String getRemoveFlag() {
+		return removeFlag;
+	}
+
+	public String getRunType() {
+		return runType;
+	}
+
+	public String getRunTypeLike() {
+		if (runTypeLike != null && runTypeLike.trim().length() > 0) {
+			if (!runTypeLike.startsWith("%")) {
+				runTypeLike = "%" + runTypeLike;
+			}
+			if (!runTypeLike.endsWith("%")) {
+				runTypeLike = runTypeLike + "%";
+			}
+		}
+		return runTypeLike;
+	}
+
+	public Long getServerId() {
+		return serverId;
+	}
+
+	public String getTicket() {
+		return ticket;
+	}
+
 	public String getTitleLike() {
 		if (titleLike != null && titleLike.trim().length() > 0) {
 			if (!titleLike.startsWith("%")) {
-				titleLike = "%" + hostLike;
+				titleLike = "%" + titleLike;
 			}
 			if (!titleLike.endsWith("%")) {
 				titleLike = titleLike + "%";
@@ -174,8 +221,12 @@ public class DatabaseQuery extends DataQuery {
 		return type;
 	}
 
-	public List<String> getTypes() {
-		return types;
+	public String getUserNameKey() {
+		return userNameKey;
+	}
+
+	public String getUseType() {
+		return useType;
 	}
 
 	public DatabaseQuery host(String host) {
@@ -206,7 +257,7 @@ public class DatabaseQuery extends DataQuery {
 	public void initQueryColumns() {
 		super.initQueryColumns();
 		addColumn("id", "ID_");
-		addColumn("nodeId", "NODEID_");
+		addColumn("parentId", "PARENTID_");
 		addColumn("host", "HOST_");
 		addColumn("port", "PORT_");
 		addColumn("user", "USER_");
@@ -217,19 +268,35 @@ public class DatabaseQuery extends DataQuery {
 		addColumn("active", "ACTIVE_");
 	}
 
-	public DatabaseQuery nodeId(Long nodeId) {
-		if (nodeId == null) {
-			throw new RuntimeException("nodeId is null");
+	public DatabaseQuery programId(String programId) {
+		if (programId == null) {
+			throw new RuntimeException("programId is null");
 		}
-		this.nodeId = nodeId;
+		this.programId = programId;
 		return this;
 	}
 
-	public DatabaseQuery nodeIds(List<Long> nodeIds) {
-		if (nodeIds == null) {
-			throw new RuntimeException("nodeIds is empty ");
+	public DatabaseQuery programName(String programName) {
+		if (programName == null) {
+			throw new RuntimeException("programName is null");
 		}
-		this.nodeIds = nodeIds;
+		this.programName = programName;
+		return this;
+	}
+
+	public DatabaseQuery runType(String runType) {
+		if (runType == null) {
+			throw new RuntimeException("runType is null");
+		}
+		this.runType = runType;
+		return this;
+	}
+
+	public DatabaseQuery serverId(Long serverId) {
+		if (serverId == null) {
+			throw new RuntimeException("serverId is null");
+		}
+		this.serverId = serverId;
 		return this;
 	}
 
@@ -245,8 +312,7 @@ public class DatabaseQuery extends DataQuery {
 		this.code = code;
 	}
 
-	public void setCreateTimeGreaterThanOrEqual(
-			Date createTimeGreaterThanOrEqual) {
+	public void setCreateTimeGreaterThanOrEqual(Date createTimeGreaterThanOrEqual) {
 		this.createTimeGreaterThanOrEqual = createTimeGreaterThanOrEqual;
 	}
 
@@ -270,12 +336,36 @@ public class DatabaseQuery extends DataQuery {
 		this.initFlag = initFlag;
 	}
 
-	public void setNodeId(Long nodeId) {
-		this.nodeId = nodeId;
+	public void setKeywordsLike(String keywordsLike) {
+		this.keywordsLike = keywordsLike;
 	}
 
-	public void setNodeIds(List<Long> nodeIds) {
-		this.nodeIds = nodeIds;
+	public void setProgramId(String programId) {
+		this.programId = programId;
+	}
+
+	public void setProgramName(String programName) {
+		this.programName = programName;
+	}
+
+	public void setRemoveFlag(String removeFlag) {
+		this.removeFlag = removeFlag;
+	}
+
+	public void setRunType(String runType) {
+		this.runType = runType;
+	}
+
+	public void setRunTypeLike(String runTypeLike) {
+		this.runTypeLike = runTypeLike;
+	}
+
+	public void setServerId(Long serverId) {
+		this.serverId = serverId;
+	}
+
+	public void setTicket(String ticket) {
+		this.ticket = ticket;
 	}
 
 	public void setTitleLike(String titleLike) {
@@ -286,8 +376,20 @@ public class DatabaseQuery extends DataQuery {
 		this.type = type;
 	}
 
-	public void setTypes(List<String> types) {
-		this.types = types;
+	public void setUserNameKey(String userNameKey) {
+		this.userNameKey = userNameKey;
+	}
+
+	public void setUseType(String useType) {
+		this.useType = useType;
+	}
+
+	public DatabaseQuery ticket(String ticket) {
+		if (ticket == null) {
+			throw new RuntimeException("ticket is null");
+		}
+		this.ticket = ticket;
+		return this;
 	}
 
 	public DatabaseQuery type(String type) {
@@ -298,11 +400,11 @@ public class DatabaseQuery extends DataQuery {
 		return this;
 	}
 
-	public DatabaseQuery types(List<String> types) {
-		if (types == null) {
-			throw new RuntimeException("types is empty ");
+	public DatabaseQuery userNameKey(String userNameKey) {
+		if (userNameKey == null) {
+			throw new RuntimeException("userNameKey is null");
 		}
-		this.types = types;
+		this.userNameKey = userNameKey;
 		return this;
 	}
 

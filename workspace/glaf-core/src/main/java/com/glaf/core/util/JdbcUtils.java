@@ -44,6 +44,31 @@ public final class JdbcUtils {
 		}
 	}
 
+	public static void close(Connection con, Statement stmt, ResultSet rs) {
+		try {
+			if (con != null && !con.isClosed()) {
+				con.close();
+			}
+		} catch (SQLException ex) {
+		}
+
+		try {
+			if (stmt != null) {
+				stmt.close();
+				stmt = null;
+			}
+		} catch (SQLException ex) {
+		}
+
+		try {
+			if (rs != null) {
+				rs.close();
+				rs = null;
+			}
+		} catch (SQLException ex) {
+		}
+	}
+
 	public static void close(ResultSet rs) {
 		try {
 			if (rs != null) {
@@ -73,8 +98,25 @@ public final class JdbcUtils {
 		}
 	}
 
-	public static void fillStatement(PreparedStatement stmt, List<Object> params)
-			throws SQLException {
+	public static void close(Statement stmt, ResultSet rs) {
+		try {
+			if (stmt != null) {
+				stmt.close();
+				stmt = null;
+			}
+		} catch (SQLException ex) {
+		}
+
+		try {
+			if (rs != null) {
+				rs.close();
+				rs = null;
+			}
+		} catch (SQLException ex) {
+		}
+	}
+
+	public static void fillStatement(PreparedStatement stmt, List<Object> params) throws SQLException {
 		if (params == null || params.size() == 0) {
 			return;
 		}
@@ -91,8 +133,7 @@ public final class JdbcUtils {
 					Timestamp datetime = (Timestamp) object;
 					stmt.setTimestamp(i + 1, datetime);
 				} else if (object instanceof java.util.Date) {
-					Timestamp datetime = DateUtils
-							.toTimestamp((java.util.Date) object);
+					Timestamp datetime = DateUtils.toTimestamp((java.util.Date) object);
 					stmt.setTimestamp(i + 1, datetime);
 				} else {
 					stmt.setObject(i + 1, object);
@@ -122,7 +163,7 @@ public final class JdbcUtils {
 		SqlExecutor sqlExecutor = new SqlExecutor();
 		List<Object> values = new java.util.ArrayList<Object>();
 		Map<String, Object> dataMap = lowerKeyMap(params);
-		StringBuffer sb = new StringBuffer(sql.length() + 1000);
+		StringBuilder sb = new StringBuilder(sql.length() + 1000);
 		int begin = 0;
 		int end = 0;
 		boolean flag = false;
@@ -163,6 +204,18 @@ public final class JdbcUtils {
 				con.rollback();
 			}
 		} catch (SQLException ex) {
+		}
+	}
+
+	public static void skipRows(ResultSet rs, int firstResult) throws SQLException {
+		if (rs.getType() != ResultSet.TYPE_FORWARD_ONLY) {
+			if (firstResult != 0) {
+				rs.absolute(firstResult);
+			}
+		} else {
+			for (int i = 0; i < firstResult; i++) {
+				rs.next();
+			}
 		}
 	}
 

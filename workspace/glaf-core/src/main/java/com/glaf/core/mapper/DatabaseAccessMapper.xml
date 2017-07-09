@@ -14,7 +14,7 @@
 	<insert id="insertDatabaseAccess" parameterType="com.glaf.core.domain.DatabaseAccess">
 
 		insert into
-		SYS_DATABASE_ACCESS ( ID_,DATABASEID_,ACTORID_ )
+		SYS_DATABASE_ACCESS (ID_, DATABASEID_, ACTORID_ )
 		values
 		(#{id,jdbcType=BIGINT},
 		#{databaseId, jdbcType=BIGINT},

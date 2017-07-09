@@ -58,7 +58,6 @@ import com.glaf.core.jdbc.DBConnectionFactory;
 import com.glaf.core.query.TablePageQuery;
 import com.glaf.core.service.ISystemParamService;
 import com.glaf.core.service.ITableDataService;
-import com.glaf.core.service.ITableDefinitionService;
 import com.glaf.core.service.ITablePageService;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.DateUtils;
@@ -84,8 +83,6 @@ public class MxSystemDbTableController {
 	protected static AtomicBoolean running = new AtomicBoolean(false);
 
 	protected ITableDataService tableDataService;
-
-	protected ITableDefinitionService tableDefinitionService;
 
 	protected ITablePageService tablePageService;
 
@@ -471,9 +468,9 @@ public class MxSystemDbTableController {
 						tableDefinition.setIdColumn(column);
 					}
 				}
-				Document doc = xmlWriter.write(tableDefinition);
-				byte[] bytes = Dom4jUtils.getBytesFromPrettyDocument(doc);
-				bytesMap.put(table + ".mapping.xml", bytes);
+				//Document doc = xmlWriter.write(tableDefinition);
+				//byte[] bytes = Dom4jUtils.getBytesFromPrettyDocument(doc);
+				//bytesMap.put(table + ".mapping.xml", bytes);
 			}
 			if (!bytesMap.isEmpty()) {
 				byte[] bytes = ZipUtils.toZipBytes(bytesMap);
@@ -742,12 +739,6 @@ public class MxSystemDbTableController {
 	@javax.annotation.Resource
 	public void setTableDataService(ITableDataService tableDataService) {
 		this.tableDataService = tableDataService;
-	}
-
-	@javax.annotation.Resource
-	public void setTableDefinitionService(
-			ITableDefinitionService tableDefinitionService) {
-		this.tableDefinitionService = tableDefinitionService;
 	}
 
 	@javax.annotation.Resource

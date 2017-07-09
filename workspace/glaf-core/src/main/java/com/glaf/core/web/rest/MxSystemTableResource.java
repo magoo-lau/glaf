@@ -31,7 +31,6 @@ import com.glaf.core.domain.ColumnDefinition;
 import com.glaf.core.domain.TableDefinition;
 import com.glaf.core.query.TableDefinitionQuery;
 import com.glaf.core.query.TablePageQuery;
-import com.glaf.core.service.ITableDefinitionService;
 import com.glaf.core.service.ITablePageService;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.DateUtils;
@@ -52,74 +51,8 @@ public class MxSystemTableResource {
 
 	protected ITablePageService tablePageService;
 
-	protected ITableDefinitionService tableDefinitionService;
+	
 
-	@POST
-	@Path("/updateMetaInfo")
-	@ResponseBody
-	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-	public byte[] updateMetaInfo(@Context HttpServletRequest request,
-			@Context UriInfo uriInfo) throws IOException {
-		String tables = request.getParameter("tables");
-
-		if (StringUtils.isNotEmpty(tables)) {
-			TableDefinitionQuery query = new TableDefinitionQuery();
-
-			List<TableDefinition> list = tableDefinitionService
-					.getTableColumnsCount(query);
-			Map<String, TableDefinition> tableMap = new java.util.HashMap<String, TableDefinition>();
-			if (list != null && !list.isEmpty()) {
-				for (TableDefinition t : list) {
-					tableMap.put(t.getTableName().toLowerCase(), t);
-				}
-				list.clear();
-			}
-
-			List<String> list2 = StringTools.split(tables);
-			for (String tableName : list2) {
-				String tbl = tableName;
-				if (DBUtils.isTemoraryTable(tableName)) {
-					continue;
-				}
-				if (tableMap.get(tableName) == null) {
-					try {
-						List<ColumnDefinition> columns = DBUtils
-								.getColumnDefinitions(tbl);
-						tableDefinitionService.saveSystemTable(tableName,
-								columns);
-						logger.debug(tableName + " save ok");
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				} else {
-					TableDefinition table = tableMap.get(tableName);
-					boolean success = false;
-					int retry = 0;
-					while (retry < 2 && !success) {
-						try {
-							retry++;
-							List<ColumnDefinition> columns = DBUtils
-									.getColumnDefinitions(tbl);
-							if (table.getColumnQty() != columns.size()) {
-								tableDefinitionService.saveSystemTable(
-										tableName, columns);
-								logger.debug(tableName + " save ok");
-							} else {
-								logger.debug(tableName + " check ok");
-							}
-							success = true;
-						} catch (Exception ex) {
-							ex.printStackTrace();
-						}
-					}
-				}
-			}
-
-			return ResponseUtils.responseJsonResult(true);
-		}
-
-		return ResponseUtils.responseJsonResult(false);
-	}
 
 	@GET
 	@POST
@@ -283,12 +216,6 @@ public class MxSystemTableResource {
 	@javax.annotation.Resource
 	public void setTablePageService(ITablePageService tablePageService) {
 		this.tablePageService = tablePageService;
-	}
-
-	@javax.annotation.Resource
-	public void setTableDefinitionService(
-			ITableDefinitionService tableDefinitionService) {
-		this.tableDefinitionService = tableDefinitionService;
 	}
 
 }

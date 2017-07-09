@@ -63,7 +63,7 @@ public class DBConnectionFactory {
 				return true;
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			
 			logger.error(ex);
 		} finally {
 			JdbcUtils.close(connection);
@@ -92,7 +92,7 @@ public class DBConnectionFactory {
 			}
 		} catch (Exception ex) {
 			logger.error(ex);
-			ex.printStackTrace();
+			
 		} finally {
 			JdbcUtils.close(connection);
 		}
@@ -136,7 +136,7 @@ public class DBConnectionFactory {
 
 		} catch (Exception ex) {
 			logger.error(ex);
-			ex.printStackTrace();
+			
 		} finally {
 			JdbcUtils.close(connection);
 		}
@@ -181,7 +181,7 @@ public class DBConnectionFactory {
 			return connection;
 		} catch (Exception ex) {
 			logger.error(ex);
-			ex.printStackTrace();
+			
 			throw new RuntimeException(ex);
 		}
 	}
@@ -219,7 +219,7 @@ public class DBConnectionFactory {
 			return connection;
 		} catch (Exception ex) {
 			logger.error(ex);
-			ex.printStackTrace();
+			
 			throw new RuntimeException(ex);
 		}
 	}
@@ -235,8 +235,9 @@ public class DBConnectionFactory {
 			try {
 				DatabaseMetaData databaseMetaData = connection.getMetaData();
 				databaseProductName = databaseMetaData.getDatabaseProductName();
+				logger.debug("databaseProductName:"+databaseProductName);
 			} catch (SQLException ex) {
-				ex.printStackTrace();
+				
 				throw new RuntimeException(ex);
 			}
 			String dbType = databaseTypeMappings

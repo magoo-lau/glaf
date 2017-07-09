@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.glaf.core.base.TableModel;
 import com.glaf.core.domain.TableDefinition;
@@ -40,11 +39,16 @@ public interface ITableDataService {
 	@Transactional
 	void deleteTableData(TableModel model);
 
+	/**
+	 * 删除数据
+	 * 
+	 * @param rows
+	 */
+	@Transactional
+	void deleteTableDataList(List<TableModel> rows);
+
 	List<Dbid> getAllDbids();
-	
-	List<Map<String, Object>> getTableKeyMap(TableModel model);
-	
-	
+
 	/**
 	 * 获取一页数据
 	 * 
@@ -55,24 +59,38 @@ public interface ITableDataService {
 	 */
 	Paging getPageData(int pageNo, int pageSize, TableModel model);
 
+	/**
+	 * 通过表及主键获取一条记录
+	 * 
+	 * @param model
+	 * @return
+	 */
 	Map<String, Object> getTableDataByPrimaryKey(TableModel model);
 
 	/**
-	 * 批量插入数据
+	 * 获取某个表的主键集合
 	 * 
-	 * @param rows
+	 * @param model
+	 * @return
 	 */
-	@Transactional
-	void insertTableData(List<TableModel> rows);
+	List<Map<String, Object>> getTableKeyMap(TableModel model);
 
 	/**
 	 * 批量插入数据
 	 * 
-	 * @param tableName
 	 * @param rows
 	 */
 	@Transactional
-	void insertTableData(String tableName, List<Map<String, Object>> rows);
+	void insertAllTableData(List<TableModel> rows);
+
+	/**
+	 * 批量插入数据
+	 * 
+	 * @param tableDefinition
+	 * @param rows
+	 */
+	@Transactional
+	void insertTableData(TableDefinition tableDefinition, List<Map<String, Object>> rows);
 
 	/**
 	 * 插入一条记录
@@ -81,23 +99,6 @@ public interface ITableDataService {
 	 */
 	@Transactional
 	void insertTableData(TableModel model);
-	
-	/**
-	 * 插入一条记录
-	 * 
-	 * @param model
-	 */
-	@Transactional
-	void insertAllTableData(List<TableModel> rows);
-
-	/**
-	 * 批量保存记录
-	 * 
-	 * @param tableName
-	 * @param rows
-	 */
-	@Transactional
-	void saveAll(String tableName, String seqNo, Collection<TableModel> rows);
 
 	/**
 	 * 批量保存记录
@@ -106,19 +107,7 @@ public interface ITableDataService {
 	 * @param rows
 	 */
 	@Transactional
-	Collection<TableModel> saveAll(TableDefinition tableDefinition,
-			String seqNo, Collection<TableModel> rows);
-
-	/**
-	 * 批量新增或修改记录，如果存在，可以选择是否更新
-	 * 
-	 * @param tableName
-	 * @param updatable
-	 * @param rows
-	 */
-	@Transactional
-	void saveOrUpdate(String tableName, boolean updatable,
-			List<Map<String, Object>> rows);
+	Collection<TableModel> saveAll(TableDefinition tableDefinition, String seqNo, Collection<TableModel> rows);
 
 	/**
 	 * 批量新增或修改记录，如果存在，可以选择是否更新
@@ -128,17 +117,7 @@ public interface ITableDataService {
 	 * @param rows
 	 */
 	@Transactional
-	void saveOrUpdate(TableDefinition tableDefinition, boolean updatable,
-			List<Map<String, Object>> rows);
-	
-	/**
-	 * 保存JSON数组数据到指定的表
-	 * 
-	 * @param tableName
-	 * @param rows
-	 */
-	@Transactional
-	void saveTableData(String tableName, JSONArray rows);
+	void saveOrUpdate(TableDefinition tableDefinition, boolean updatable, List<Map<String, Object>> rows);
 
 	/**
 	 * 保存JSON数据到指定的表
@@ -147,7 +126,7 @@ public interface ITableDataService {
 	 * @param jsonObject
 	 */
 	@Transactional
-	void saveTableData(String tableName, JSONObject jsonObject);
+	void saveTableData(TableDefinition tableDefinition, JSONObject jsonObject);
 
 	/**
 	 * 更新序列
@@ -163,16 +142,10 @@ public interface ITableDataService {
 	 * @param rows
 	 */
 	@Transactional
-	void updateTableData(List<TableModel> rows);
+	void updateAllTableData(List<TableModel> rows);
 
-	/**
-	 * 批量更新记录
-	 * 
-	 * @param tableName
-	 * @param rows
-	 */
 	@Transactional
-	void updateTableData(String tableName, List<Map<String, Object>> rows);
+	void updateTableData(TableDefinition tableDefinition, List<Map<String, Object>> rows);
 
 	/**
 	 * 更新一条记录
@@ -181,4 +154,12 @@ public interface ITableDataService {
 	 */
 	@Transactional
 	void updateTableData(TableModel model);
+
+	/**
+	 * 根据查询条件更新记录
+	 * 
+	 * @param model
+	 */
+	@Transactional
+	void updateTableDataByWhere(TableModel model);
 }
