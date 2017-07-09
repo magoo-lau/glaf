@@ -5,7 +5,6 @@
 	<classpathentry kind="lib" path="lib/ant-tools.jar"/>
 	<classpathentry kind="lib" path="lib/antlr.jar"/>
 	<classpathentry kind="lib" path="lib/aopalliance.jar"/>
-	<classpathentry kind="lib" path="lib/asm.jar"/>
 	<classpathentry kind="lib" path="lib/aspectjrt.jar"/>
 	<classpathentry kind="lib" path="lib/aspectjweaver.jar"/>
 	<classpathentry kind="lib" path="lib/barcode4j.jar"/>
@@ -152,7 +151,6 @@
 	<classpathentry kind="lib" path="lib/jgroups.jar"/>
 	<classpathentry kind="lib" path="lib/fst.jar"/>
 	<classpathentry kind="lib" path="lib/classmate.jar"/>
-	<classpathentry kind="lib" path="lib/disruptor.jar"/>
 	<classpathentry kind="lib" path="lib/fourinone.jar"/>
 	<classpathentry kind="lib" path="lib/hazelcast-all.jar"/>
 	<classpathentry kind="lib" path="lib/jboss-logging.jar"/>
@@ -167,9 +165,6 @@
 	<classpathentry kind="lib" path="lib/staxon.jar"/>
 	<classpathentry kind="lib" path="lib/curator-client.jar"/>
 	<classpathentry kind="lib" path="lib/curator-framework.jar"/>
-	<classpathentry kind="lib" path="lib/curator-recipes.jar"/>
-	<classpathentry kind="lib" path="lib/curator-x-discovery-server.jar"/>
-	<classpathentry kind="lib" path="lib/curator-x-discovery.jar"/>
 	<classpathentry kind="lib" path="lib/netty4.jar"/>
 	<classpathentry kind="lib" path="lib/sqlite-jdbc.jar"/>
 	<classpathentry kind="lib" path="lib/jcifs.jar"/>
@@ -179,5 +174,6 @@
 	<classpathentry kind="lib" path="lib/kryo.jar"/>
 	<classpathentry kind="lib" path="lib/minlog.jar"/>
 	<classpathentry kind="lib" path="lib/objenesis.jar"/>
+	<classpathentry kind="lib" path="lib/asm-all.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

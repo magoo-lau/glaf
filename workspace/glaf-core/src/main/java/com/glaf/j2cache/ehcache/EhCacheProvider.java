@@ -147,7 +147,7 @@ public class EhCacheProvider implements CacheProvider {
 					.parseConfiguration(configStream);
 			config.setName(this.name());
 			cacheManager = CacheManager.newInstance(config);
-			cacheManager.setName(this.name());
+			//cacheManager.setName(this.name());
 			REFERENCE_COUNT.incrementAndGet();
 		}
 		cacheMap = new ConcurrentHashMap<String, EhCache>();
