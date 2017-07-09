@@ -19,7 +19,7 @@
      define subcomponents such as "Valves" at this level.
      Documentation at /docs/config/server.html
  -->
-<Server port="8005" shutdown="SHUTDOWN">
+<Server port="9025" shutdown="SHUTDOWN">
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
@@ -91,7 +91,7 @@
         maxThreads="2048" minSpareThreads="4"/>
 
 	<Connector executor="tomcatThreadPool"
-               port="8080" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               port="9090" protocol="org.apache.coyote.http11.Http11NioProtocol"
                connectionTimeout="20000"
                redirectPort="8443" server="GLAF Web Server 1.0"/>
 

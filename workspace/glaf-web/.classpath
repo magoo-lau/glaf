@@ -147,8 +147,6 @@
 	<classpathentry kind="lib" path="/glaf-core/lib/xmemcached.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/xml-apis-ext.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/xml-apis.jar"/>
-	<classpathentry kind="lib" path="/glaf-core/lib/spring-boot.RELEASE.jar"/>
-	<classpathentry kind="lib" path="/glaf-core/lib/spring-boot-autoconfigure.RELEASE.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/jboss-logging-annotations.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/jboss-logging.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/jboss-transaction.jar"/>
