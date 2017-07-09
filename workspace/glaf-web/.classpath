@@ -141,9 +141,6 @@
 	<classpathentry kind="lib" path="/glaf-core/lib/spring-web.RELEASE.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/spring-webmvc.RELEASE.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/spymemcached.jar"/>
-	<classpathentry kind="lib" path="/glaf-core/lib/sqljdbc4.jar"/>
-	<classpathentry kind="lib" path="/glaf-core/lib/tomcat-jdbc.jar"/>
-	<classpathentry kind="lib" path="/glaf-core/lib/tomcat-juli.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/xmemcached.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/xml-apis-ext.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/xml-apis.jar"/>
