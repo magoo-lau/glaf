@@ -152,5 +152,5 @@
 	<classpathentry kind="lib" path="/glaf-core/lib/jboss-transaction.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/hibernate-validator.jar"/>
 	<classpathentry kind="lib" path="/glaf-core/lib/classmate.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="WebContent/WEB-INF/classes"/>
 </classpath>
